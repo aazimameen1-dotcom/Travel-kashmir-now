@@ -1,0 +1,15 @@
+services:
+  - type: static
+    name: travel-kashmir-now
+    runtime: static
+    buildCommand: ""  # No build needed for static HTML
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: true
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /
+        destination: /index.html
+      - type: rewrite
+        source: /admin
+        destination: /admin.html
