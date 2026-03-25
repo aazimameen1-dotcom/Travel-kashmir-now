@@ -1,0 +1,13 @@
+Reinitialized existing Git repository in C:/Users/Aazim/Desktop/travel/Travel-kashmir-now/.git/
+warning: in the working copy of 'index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'admin.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test_db.py', LF will be replaced by CRLF the next time Git touches it
+[main 15d56eb] Initial deploy
+ 8 files changed, 938 insertions(+), 102 deletions(-)
+ create mode 100644 admin.html
+ create mode 100644 error.txt
+ create mode 100644 kashmir_urls.txt
+ create mode 100644 out.txt
+ create mode 100644 output.txt
+ create mode 100644 output3.txt
+ create mode 100644 test_db.py

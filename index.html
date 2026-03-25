@@ -746,42 +746,24 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
     <!-- Dynamic Reviews -->
   </div>
   
-  <div style="text-align: center; margin-top: 3rem;">
-    <button onclick="openReviewModal()" class="leave-review-btn"><i class="ph-bold ph-pencil-simple"></i> Leave a Review</button>
-  </div>
-  
-  <!-- Review Modal -->
-  <div class="modal-overlay" id="reviewModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3><i class="ph-bold ph-star"></i> Share Your Experience</h3>
-        <button class="modal-close" onclick="closeReviewModal()"><i class="ph-bold ph-x"></i></button>
+  <div class="review-form-container">
+    <h3>Share Your Experience</h3>
+    <form id="reviewForm">
+      <input type="text" id="reviewerName" placeholder="Your Full Name" required>
+      <textarea id="reviewText" placeholder="Tell us about your trip to Kashmir..." required></textarea>
+      
+      <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">Rate your experience:</p>
+      <div class="star-rating-selector" id="starSelector">
+        <i class="ph-fill ph-star active" data-val="1"></i>
+        <i class="ph-fill ph-star active" data-val="2"></i>
+        <i class="ph-fill ph-star active" data-val="3"></i>
+        <i class="ph-fill ph-star active" data-val="4"></i>
+        <i class="ph-fill ph-star active" data-val="5"></i>
       </div>
-      <div class="modal-body">
-        <form id="reviewForm">
-          <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" id="reviewerName" placeholder="Enter your full name" required>
-          </div>
-          <div class="form-group">
-            <label>Your Review</label>
-            <textarea id="reviewText" rows="4" placeholder="Tell us about your trip to Kashmir..." required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Your Rating</label>
-            <div class="star-rating-selector" id="starSelector">
-              <i class="ph-fill ph-star active" data-val="1"></i>
-              <i class="ph-fill ph-star active" data-val="2"></i>
-              <i class="ph-fill ph-star active" data-val="3"></i>
-              <i class="ph-fill ph-star active" data-val="4"></i>
-              <i class="ph-fill ph-star active" data-val="5"></i>
-            </div>
-            <input type="hidden" id="reviewRating" value="5">
-          </div>
-          <button type="submit" class="booking-btn"><i class="ph-bold ph-paper-plane-right"></i> Publish Review</button>
-        </form>
-      </div>
-    </div>
+      <input type="hidden" id="reviewRating" value="5">
+
+      <button type="submit"><i class="ph-bold ph-paper-plane-right"></i> Publish Review</button>
+    </form>
   </div>
 </section>
 
@@ -1127,82 +1109,37 @@ document.getElementById('bookingForm').addEventListener('submit', async function
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('bookingDate').setAttribute('min', today);
 
-// Default testimonials to show when database is empty
-const defaultReviews = [
-  {
-    name: "Priya Sharma",
-    review: "Our Kashmir trip was absolutely magical! The houseboat stay on Dal Lake, the gondola ride in Gulmarg, and the warm hospitality exceeded all expectations. Highly recommend this team!",
-    rating: 5,
-    date: "2026-02-15"
-  },
-  {
-    name: "Rahul & Ananya",
-    review: "Perfect honeymoon experience! They arranged candlelight dinners, decorated our room with flowers, and the private shikara ride was so romantic. Thank you for the memories!",
-    rating: 5,
-    date: "2026-01-20"
-  },
-  {
-    name: "Vikram Patel",
-    review: "Traveled with my family of 5 and everyone had a great time. The drivers were professional, hotels were clean and comfortable. Kids loved the snow activities in Gulmarg!",
-    rating: 5,
-    date: "2025-12-28"
-  },
-  {
-    name: "Sarah Johnson",
-    review: "As a solo traveler from the UK, I felt completely safe and well taken care of. The guides spoke excellent English and showed me hidden gems not on the tourist maps.",
-    rating: 5,
-    date: "2025-11-10"
-  }
-];
-
 // Load reviews dynamically
 async function loadReviews() {
     const { data: reviews, error } = await dbClient.from('reviews').select('*').order('id',{ascending:false});
     const container = document.getElementById('reviewContainer');
     container.innerHTML = '';
     
-    // Use default reviews if database is empty
-    const displayReviews = (reviews && reviews.length > 0) ? reviews : defaultReviews;
+    // Display top 6 reviews to maintain grid structure
+    const displayReviews = reviews ? reviews.slice(0, 6) : [];
     
-    displayReviews.forEach(r => {
-        const card = document.createElement('div');
-        card.className = 'review-card';
-        const stars = '★'.repeat(r.rating || 5);
-        const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
-        const dateStr = r.date || (r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently');
-        
-        card.innerHTML = `
-          <div class="review-header">
-            <div class="avatar">${initial}</div>
-            <div class="review-meta">
-              <h4>${r.name}</h4>
-              <div class="review-stars">${stars}</div>
-              <span class="review-date"><i class="ph-bold ph-calendar-blank"></i> ${dateStr}</span>
-            </div>
-          </div>
-          <p class="review-text">"${r.review}"</p>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// Review Modal Functions
-function openReviewModal() {
-    document.getElementById('reviewModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeReviewModal() {
-    document.getElementById('reviewModal').classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-// Close review modal when clicking outside
-document.getElementById('reviewModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeReviewModal();
+    if(!error && displayReviews.length>0){
+        displayReviews.forEach(r=>{
+            const card=document.createElement('div');
+            card.className='review-card';
+            const stars=r.rating ? '★'.repeat(r.rating) : '★★★★★';
+            const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
+            card.innerHTML=`
+              <div class="review-header">
+                <div class="avatar">${initial}</div>
+                <div>
+                  <h4>${r.name}</h4>
+                  <div class="stars" style="color: #f59e0b; font-size: 1.2rem; letter-spacing: 3px; margin:0;">${stars}</div>
+                </div>
+              </div>
+              <p>"${r.review}"</p>
+            `;
+            container.appendChild(card);
+        });
+    } else {
+        container.innerHTML='<p style="text-align:center;width:100%;grid-column:1/-1; color: rgba(255,255,255,0.8);">No reviews yet. Be our first reviewer!</p>';
     }
-});
+}
 
 // Submit Review
 document.getElementById('reviewForm').addEventListener('submit', async e=>{

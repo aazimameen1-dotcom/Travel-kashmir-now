@@ -1,0 +1,90 @@
+Note: Unnecessary use of -X or --request, POST is already inferred.
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0* Host zdtmhcmcngarwieniwgk.supabase.co:443 was resolved.
+* IPv6: (none)
+* IPv4: 104.18.38.10, 172.64.149.246
+*   Trying 104.18.38.10:443...
+* schannel: disabled automatic use of client certificate
+* ALPN: curl offers http/1.1
+* ALPN: server accepted http/1.1
+* Established connection to zdtmhcmcngarwieniwgk.supabase.co (104.18.38.10 port 443) from 192.168.1.6 port 49784 
+* using HTTP/1.x
+> POST /rest/v1/reviews HTTP/1.1
+
+> Host: zdtmhcmcngarwieniwgk.supabase.co
+
+> User-Agent: curl/8.18.0
+
+> Accept: */*
+
+> apikey: sb_publishable_IxJ8eZHR-AsD1aFQqcVrRg_wRIIUDqY
+
+> Authorization: Bearer sb_publishable_IxJ8eZHR-AsD1aFQqcVrRg_wRIIUDqY
+
+> Content-Type: application/json
+
+> Prefer: return=representation
+
+> Content-Length: 49
+
+> 
+
+} [49 bytes data]
+* upload completely sent off: 49 bytes
+
+100     49   0      0 100     49      0     36   00:01   00:01             36* schannel: remote party requests renegotiation
+* schannel: renegotiating SSL/TLS connection
+* schannel: SSL/TLS connection renegotiated
+< HTTP/1.1 201 Created
+
+< Date: Wed, 25 Mar 2026 03:51:39 GMT
+
+< Content-Type: application/json; charset=utf-8
+
+< Transfer-Encoding: chunked
+
+< Connection: keep-alive
+
+< Server: cloudflare
+
+< Content-Range: */*
+
+< CF-Ray: 9e1af552c9a6d97b-DEL
+
+< CF-Cache-Status: DYNAMIC
+
+< Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+< Vary: Accept-Encoding
+
+< X-Content-Type-Options: nosniff
+
+< content-profile: public
+
+< preference-applied: return=representation
+
+< sb-gateway-version: 1
+
+< sb-project-ref: zdtmhcmcngarwieniwgk
+
+< sb-request-id: 019d231e-8fca-74dd-9d1b-a15bdc2874df
+
+< x-envoy-attempt-count: 1
+
+< x-envoy-upstream-service-time: 295
+
+< Set-Cookie: __cf_bm=wcjOLx3QTbzm.mdKZKTWiXPkY6FJorg6R7.UH5EM..E-1774410699-1.0.1.1-sCzC6tDCAQjJZOT_UVucDvmKyaHlsAzJ1ro8yUdnjJVozaD6P72NVFpD0jW5CegzuqWu0mFQRMuuh.PBGq6rkrqt6QZETlCirYOFynQoCQ4; path=/; expires=Wed, 25-Mar-26 04:21:39 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None
+
+< alt-svc: h3=":443"; ma=86400
+
+< 
+
+{ [117 bytes data]
+
+100    155   0    106 100     49     76     35   00:01   00:01             36
+100    155   0    106 100     49     76     35   00:01   00:01             36
+100    155   0    106 100     49     76     35   00:01   00:01             36
+* Connection #0 to host zdtmhcmcngarwieniwgk.supabase.co:443 left intact
+[{"id":2,"name":"Aazim","review":"Test error","rating":5,"created_at":"2026-03-25T03:51:39.480149+00:00"}]
