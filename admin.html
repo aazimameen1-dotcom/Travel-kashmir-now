@@ -19,6 +19,19 @@
 body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; }
 h1, h2, h3, .brand { font-family: 'Outfit', sans-serif; }
 
+/* Login Styles */
+.login-overlay { position: fixed; inset: 0; background: var(--primary-color); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.login-box { background: white; padding: 3rem; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.login-box h2 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem; }
+.login-box p { color: var(--text-muted); margin-bottom: 2rem; }
+.login-form { display: flex; flex-direction: column; gap: 1.5rem; }
+.login-form input { padding: 1rem; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 1rem; }
+.login-form input:focus { border-color: var(--secondary-color); outline: none; }
+.login-btn { padding: 1rem; background: var(--secondary-color); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1rem; transition: 0.3s; }
+.login-btn:hover { background: var(--primary-color); }
+.login-error { color: var(--accent-color); font-size: 0.9rem; display: none; }
+.hidden { display: none !important; }
+
 aside { width: 260px; background: var(--primary-color); color: white; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
 .brand { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
 .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 1rem; color: white; border-radius: 12px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 500; transition: 0.3s; }
@@ -56,14 +69,28 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
 </head>
 <body>
 
-<aside>
+<!-- Login Overlay -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <h2><i class="ph-bold ph-lock-key"></i> Admin Login</h2>
+    <p>Enter your credentials to access the dashboard</p>
+    <form class="login-form" id="loginForm">
+      <input type="text" id="adminId" placeholder="Admin ID" required autocomplete="username">
+      <input type="password" id="adminPassword" placeholder="Password" required autocomplete="current-password">
+      <p class="login-error" id="loginError"><i class="ph-bold ph-warning-circle"></i> Invalid credentials</p>
+      <button type="submit" class="login-btn"><i class="ph-bold ph-sign-in"></i> Login</button>
+    </form>
+  </div>
+</div>
+
+<aside id="adminSidebar" class="hidden">
   <div class="brand"><i class="ph-fill ph-paper-plane-tilt"></i> Admin Panel</div>
   <button class="nav-btn active" onclick="switchTab('packagesTab', event)"><i class="ph-bold ph-suitcase"></i> Manage Packages</button>
   <button class="nav-btn" onclick="switchTab('reviewsTab', event)"><i class="ph-bold ph-star"></i> Manage Reviews</button>
   <a href="index.html" class="nav-btn" style="text-decoration:none; margin-top:auto;"><i class="ph-bold ph-arrow-left"></i> View Live Site</a>
 </aside>
 
-<main>
+<main id="adminMain" class="hidden">
   <div class="top-bar">
     <h1 id="pageTitle">Manage Packages</h1>
     <div style="display:flex; align-items:center; gap:10px; color: var(--text-muted); font-weight:600;"><i class="ph-fill ph-user-circle" style="font-size:2rem;"></i> Supabase Admin</div>
@@ -223,6 +250,36 @@ async function deleteReview(id, btnEl) {
     tr.style.opacity = '0';
     setTimeout(() => tr.remove(), 300);
   }
+}
+
+// Admin Credentials (in production, use proper backend auth)
+const ADMIN_ID = 'admin';
+const ADMIN_PASSWORD = 'admin123';
+
+// Login Handler
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const id = document.getElementById('adminId').value;
+  const password = document.getElementById('adminPassword').value;
+  const errorMsg = document.getElementById('loginError');
+  
+  if (id === ADMIN_ID && password === ADMIN_PASSWORD) {
+    // Hide login, show admin
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('adminSidebar').classList.remove('hidden');
+    document.getElementById('adminMain').classList.remove('hidden');
+    // Save session
+    sessionStorage.setItem('adminLoggedIn', 'true');
+  } else {
+    errorMsg.style.display = 'block';
+  }
+});
+
+// Check if already logged in
+if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('adminSidebar').classList.remove('hidden');
+  document.getElementById('adminMain').classList.remove('hidden');
 }
 </script>
 
