@@ -61,6 +61,16 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
 .delete-btn { background: #fee2e2; color: var(--accent-color); border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; display:flex; align-items:center; gap:5px; transition: 0.2s;}
 .delete-btn:hover { background: var(--accent-color); color: white; }
 
+/* Image Upload Styles */
+.image-upload-container { display: flex; flex-direction: column; gap: 0.5rem; }
+.image-file-input { padding: 0.8rem; border: 2px dashed #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+.image-file-input:hover { border-color: var(--secondary-color); background: rgba(15, 118, 110, 0.05); }
+.upload-status { color: var(--text-muted); font-size: 0.85rem; }
+.upload-status.uploading { color: var(--secondary-color); }
+.upload-status.success { color: #22c55e; }
+.upload-status.error { color: var(--accent-color); }
+.image-preview img { border: 2px solid #e2e8f0; }
+
 .section { display: none; }
 .section.active { display: block; }
 .stars { color: #f59e0b; font-size: 1.2rem; letter-spacing: 2px;}
@@ -112,9 +122,16 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
           <label>Package Title/Name</label>
           <input type="text" id="tourName" placeholder="e.g. Magical 5-Day Gulmarg Escape" required>
         </div>
-        <div class="form-group">
-          <label>Cover Image URL</label>
-          <input type="url" id="tourImage" placeholder="https://..." value="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Dal_Lake_Hazratbal_Srinagar.jpg/800px-Dal_Lake_Hazratbal_Srinagar.jpg" required>
+        <div class="form-group full-width">
+          <label>Cover Image</label>
+          <div class="image-upload-container">
+            <input type="file" id="tourImageFile" accept="image/*" class="image-file-input">
+            <div class="image-preview" id="imagePreview">
+              <img id="previewImg" src="" alt="Preview" style="display:none; max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 10px;">
+            </div>
+            <input type="hidden" id="tourImage" required>
+          </div>
+          <small class="upload-status" id="uploadStatus">Select an image to upload</small>
         </div>
         <div class="form-group">
           <label>Price (₹)</label>
@@ -180,6 +197,70 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
 const supabaseUrl = 'https://zdtmhcmcngarwieniwgk.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkdG1oY21jbmdhcndpZW5pd2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NjY3NTYsImV4cCI6MjA4MzM0Mjc1Nn0.pHXBfF6JAVOL7qutj-c-DWADI5aYEO-D9dwiPIsuJt0';
 const dbClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Image Upload Handling
+const imageFileInput = document.getElementById('tourImageFile');
+const tourImageUrl = document.getElementById('tourImage');
+const previewImg = document.getElementById('previewImg');
+const uploadStatus = document.getElementById('uploadStatus');
+
+imageFileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    previewImg.src = event.target.result;
+    previewImg.style.display = 'block';
+    uploadStatus.textContent = 'Image selected - ready to upload';
+    uploadStatus.className = 'upload-status success';
+    
+    // For demo: store base64 (in production, upload to Cloudinary/ImgBB/Supabase Storage)
+    // Limit: Only use for small images (< 500KB) to avoid DB issues
+    if (file.size < 500000) {
+      tourImageUrl.value = event.target.result; // Base64 for small images
+    } else {
+      uploadStatus.textContent = 'Image too large. Please use URL option or compress image.';
+      uploadStatus.className = 'upload-status error';
+      tourImageUrl.value = '';
+    }
+  };
+  reader.readAsDataURL(file);
+});
+
+// Alternative: Upload to ImgBB (requires API key)
+async function uploadToImgBB(file) {
+  // Replace with your ImgBB API key
+  const IMGBB_API_KEY = 'YOUR_IMGBB_API_KEY_HERE';
+  
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  try {
+    uploadStatus.textContent = 'Uploading...';
+    uploadStatus.className = 'upload-status uploading';
+    
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      tourImageUrl.value = data.data.url;
+      uploadStatus.textContent = 'Image uploaded successfully!';
+      uploadStatus.className = 'upload-status success';
+      return data.data.url;
+    } else {
+      throw new Error('Upload failed');
+    }
+  } catch (error) {
+    uploadStatus.textContent = 'Upload failed. Using base64 fallback (small images only).';
+    uploadStatus.className = 'upload-status error';
+    return null;
+  }
+}
 
 // Navigation Logic
 function switchTab(tabId, event) {
