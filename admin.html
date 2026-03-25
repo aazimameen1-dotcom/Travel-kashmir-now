@@ -220,6 +220,10 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
           <label>Price (₹)</label>
           <input type="number" id="tourPrice" placeholder="15000" required>
         </div>
+        <div class="form-group">
+          <label>Duration (Days)</label>
+          <input type="text" id="tourDuration" placeholder="e.g. 3 Nights / 4 Days" required>
+        </div>
         <div class="form-group full-width">
           <label>Description</label>
           <textarea id="tourDesc" placeholder="Enter package details..." rows="3" required></textarea>
@@ -238,6 +242,7 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
         <thead>
           <tr>
             <th>Package Name</th>
+            <th>Duration</th>
             <th>Price (₹)</th>
             <th>Rating</th>
             <th>Action</th>
@@ -459,6 +464,7 @@ document.getElementById('addTourForm').addEventListener('submit', async (e) => {
     name: document.getElementById('tourName').value,
     image: document.getElementById('tourImage').value,
     price: parseInt(document.getElementById('tourPrice').value),
+    duration: document.getElementById('tourDuration').value,
     description: document.getElementById('tourDesc').value,
     rating: 5
   };
@@ -542,16 +548,16 @@ async function deleteReview(id, btnEl) {
 // Load and Delete Packages logic
 async function loadAdminPackages() {
   const tbody = document.getElementById('packagesTbody');
-  tbody.innerHTML = '<tr><td colspan="4"><i class="ph-bold ph-spinner ph-spin"></i> Loading packages...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5"><i class="ph-bold ph-spinner ph-spin"></i> Loading packages...</td></tr>';
   const { data: packages, error } = await dbClient.from('tours').select('*').order('id', {ascending: false});
   
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="4" style="color:red;">Error loading packages. Are permissions working?</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="color:red;">Error loading packages. Are permissions working?</td></tr>`;
     return;
   }
   
   if (!packages || packages.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No packages found in the database.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">No packages found in the database.</td></tr>';
     return;
   }
 
@@ -560,6 +566,7 @@ async function loadAdminPackages() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong>${p.name}</strong></td>
+      <td>${p.duration || 'N/A'}</td>
       <td>₹${p.price?.toLocaleString() || 'N/A'}</td>
       <td class="stars">${'★'.repeat(p.rating || 5)}</td>
       <td><button class="delete-btn" onclick="deletePackage(${p.id}, this)"><i class="ph-bold ph-trash"></i> Delete</button></td>
