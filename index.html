@@ -343,6 +343,42 @@ form button:hover { background: var(--primary-color); box-shadow: 0 10px 20px rg
 /* --- Footer --- */
 footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color); color: var(--text-muted); font-weight: 500; font-size: 1.1rem;}
 
+/* --- Footer Links --- */
+.footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto 3rem; text-align: left; }
+.footer-section h4 { color: var(--primary-color); font-size: 1.2rem; margin-bottom: 1rem; font-weight: 700; }
+.footer-section a { display: block; color: var(--text-muted); text-decoration: none; padding: 0.3rem 0; transition: color 0.3s; }
+.footer-section a:hover { color: var(--secondary-color); }
+.footer-bottom { border-top: 1px solid #e2e8f0; padding-top: 2rem; margin-top: 2rem; }
+
+/* --- Booking Modal --- */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 1rem; }
+.modal-overlay.active { display: flex; }
+.modal { background: white; border-radius: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.3); animation: modalSlide 0.3s ease; }
+@keyframes modalSlide { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { color: var(--primary-color); font-size: 1.5rem; margin: 0; }
+.modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: all 0.3s; }
+.modal-close:hover { background: #f1f5f9; color: var(--primary-color); }
+.modal-body { padding: 2rem; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600; font-size: 0.95rem; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 1rem 1.2rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; transition: all 0.3s; background: #f8fafc; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--secondary-color); outline: none; background: white; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.booking-btn { width: 100%; padding: 1.2rem; background: var(--secondary-color); color: white; font-weight: 700; font-size: 1.1rem; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.booking-btn:hover { background: var(--primary-color); }
+
+/* Contact Form Section */
+.contact-form-section { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); margin-top: 3rem; }
+.map-container { border-radius: 16px; overflow: hidden; margin-top: 3rem; box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+.map-container iframe { width: 100%; height: 400px; border: none; }
+
+/* Package highlights */
+.package-highlights { list-style: none; padding: 0; margin: 1rem 0; }
+.package-highlights li { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+.package-highlights li i { color: var(--secondary-color); }
+.package-duration { display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(15, 118, 110, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+
 /* --- Animations --- */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(40px); }
@@ -752,41 +788,290 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
 </div>
 
 <footer>
-  <p>© 2026 Travel Kashmir Now. Crafted with ❤️ for wanderlust.</p>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <a href="#tours">Tour Packages</a>
+      <a href="#cab">Transport Services</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#reviews">Reviews</a>
+    </div>
+    <div class="footer-section">
+      <h4>Company</h4>
+      <a href="about.html">About Us</a>
+      <a href="terms.html">Terms & Conditions</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="cancellation.html">Cancellation Policy</a>
+    </div>
+    <div class="footer-section">
+      <h4>Contact</h4>
+      <a href="tel:+918899434467">+91 8899434467</a>
+      <a href="mailto:travelkashmir11@gmail.com">travelkashmir11@gmail.com</a>
+      <a href="#contact">Srinagar, J&K, India</a>
+    </div>
+    <div class="footer-section">
+      <h4>Follow Us</h4>
+      <a href="#" target="_blank"><i class="ph-bold ph-facebook-logo"></i> Facebook</a>
+      <a href="#" target="_blank"><i class="ph-bold ph-instagram-logo"></i> Instagram</a>
+      <a href="https://wa.me/918899434467" target="_blank"><i class="ph-bold ph-whatsapp-logo"></i> WhatsApp</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Travel Kashmir Now. Crafted with ❤️ for wanderlust.</p>
+  </div>
 </footer>
 
+<!-- Booking Modal -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="ph-bold ph-calendar-check"></i> Book Your Trip</h3>
+      <button class="modal-close" onclick="closeBookingModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="bookingForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-group">
+          <label>Selected Package</label>
+          <input type="text" id="bookingPackage" name="package" readonly>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="bookingName" name="name" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="bookingEmail" name="email" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" id="bookingPhone" name="phone" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-group">
+            <label>Travel Date *</label>
+            <input type="date" id="bookingDate" name="travel_date" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Number of Travelers *</label>
+            <select id="bookingTravelers" name="travelers" required>
+              <option value="">Select</option>
+              <option value="1">1 Person</option>
+              <option value="2">2 People</option>
+              <option value="3">3 People</option>
+              <option value="4">4 People</option>
+              <option value="5">5 People</option>
+              <option value="6+">6+ People</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Service Type</label>
+            <select id="bookingService" name="service_type">
+              <option value="Tour Package">Tour Package</option>
+              <option value="Cab Service">Cab Service Only</option>
+              <option value="Custom">Custom Request</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Special Requests</label>
+          <textarea id="bookingRequests" name="requests" rows="3" placeholder="Any special requirements, dietary restrictions, preferred hotels, etc."></textarea>
+        </div>
+        <button type="submit" class="booking-btn"><i class="ph-bold ph-paper-plane-right"></i> Send Inquiry</button>
+        <p style="text-align:center; margin-top:1rem; color:var(--text-muted); font-size:0.9rem;"><i class="ph-bold ph-info"></i> We'll respond within 24 hours</p>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-// Load tours dynamically
+// Load default tour packages (will be used if Supabase is empty)
+const defaultPackages = [
+  {
+    name: "Srinagar & Gulmarg 3N/4D",
+    duration: "3 Nights / 4 Days",
+    price: 18500,
+    rating: 5,
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Dal_Lake_Hazratbal_Srinagar.jpg/1280px-Dal_Lake_Hazratbal_Srinagar.jpg",
+    description: "Experience the best of Kashmir with Shikara rides on Dal Lake, Gulmarg Gondola, and beautiful Mughal Gardens.",
+    highlights: ["Shikara Ride on Dal Lake", "Gulmarg Gondola", "Mughal Gardens", "Srinagar Houseboat Stay"]
+  },
+  {
+    name: "Kashmir Paradise 4N/5D",
+    duration: "4 Nights / 5 Days",
+    price: 24500,
+    rating: 5,
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Ancient_Temple%2C_Gulmarg.jpg/1280px-Ancient_Temple%2C_Gulmarg.jpg",
+    description: "Complete Kashmir tour covering Srinagar, Gulmarg, Pahalgam, and Sonamarg with premium accommodations.",
+    highlights: ["All Major Destinations", "Pahalgam Valley", "Betaab Valley", "Premium Hotels"]
+  },
+  {
+    name: "Romantic Honeymoon 5N/6D",
+    duration: "5 Nights / 6 Days",
+    price: 32500,
+    rating: 5,
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/LiddarRiverJhelum.jpeg/1280px-LiddarRiverJhelum.jpeg",
+    description: "Special honeymoon package with romantic houseboat stays, candlelight dinners, and private tours.",
+    highlights: ["Romantic Houseboat", "Candlelight Dinner", "Private Shikara", "Flower Decoration"]
+  },
+  {
+    name: "Adventure Trekking 6N/7D",
+    duration: "6 Nights / 7 Days",
+    price: 28500,
+    rating: 5,
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Kashmir_Valley.jpg/1280px-Kashmir_Valley.jpg",
+    description: "Adventure package for trekking enthusiasts covering Sonamarg, Thajiwas Glacier, and mountain trails.",
+    highlights: ["Thajiwas Glacier Trek", "Sonamarg Meadows", "Camping Experience", "Guide Included"]
+  },
+  {
+    name: "Family Fun Package 4N/5D",
+    duration: "4 Nights / 5 Days",
+    price: 22000,
+    rating: 5,
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Chashme_Shahi.jpg/1280px-Chashme_Shahi.jpg",
+    description: "Perfect family vacation with activities for all ages, comfortable stays, and kid-friendly meals.",
+    highlights: ["Kid-Friendly Activities", "Comfortable SUVs", "All Meals Included", "Tulip Garden (Seasonal)"]
+  },
+  {
+    name: "Winter Wonderland 3N/4D",
+    duration: "3 Nights / 4 Days",
+    price: 20500,
+    rating: 5,
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Gulmarg_Snow.jpg/1280px-Gulmarg_Snow.jpg",
+    description: "Winter special with skiing, snowboarding, and snow activities in Gulmarg - Asia's best ski resort.",
+    highlights: ["Skiing in Gulmarg", "Snowboarding", "Gondola Phase 2", "Warm Kashmiri Kahwa"]
+  }
+];
+
+// Load tours - use default if Supabase is empty
 async function loadTours() {
     const { data: tours, error } = await dbClient.from('tours').select('*');
     const container = document.getElementById('tourContainer');
     container.innerHTML = '';
-    if(!error && tours.length>0){
-        tours.forEach(tour=>{
-            const card = document.createElement('div');
-            card.className='card';
-            const stars = tour.rating ? '★'.repeat(tour.rating) : '★★★★★';
-            // Determine price badge logic
-            const badgeContent = tour.price ? `₹${tour.price}` : 'Recommended';
-            
-            card.innerHTML=`
-              <div class="card-img-wrapper">
-                <span class="price-badge">${badgeContent}</span>
-                <img src="${tour.image}" alt="${tour.name}" onerror="this.onerror=null;this.src='https://picsum.photos/id/1043/800/600';">
-              </div>
-              <div class="card-content">
-                <h3>${tour.name}</h3>
-                <div class="stars">${stars}</div>
-                <p>${tour.description}</p>
-                <a href="https://wa.me/918899434467?text=Hi! I am interested in the ${encodeURIComponent(tour.name)} package." class="book-btn" target="_blank">Inquire Now <i class="ph-bold ph-arrow-right"></i></a>
-              </div>
-            `;
-            container.appendChild(card);
-        });
-    } else if (!tours || tours.length === 0) {
-        container.innerHTML='<p style="text-align:center;width:100%;grid-column:1/-1; color: var(--text-muted); font-size: 1.2rem;">Our special packages are currently being updated. Contact us directly to book a custom tour!</p>';
-    }
+    
+    const displayTours = (tours && tours.length > 0) ? tours : defaultPackages;
+    
+    displayTours.forEach((tour, index)=>{
+        const card = document.createElement('div');
+        card.className='card';
+        const stars = tour.rating ? '★'.repeat(tour.rating) : '★★★★★';
+        const badgeContent = tour.price ? `₹${tour.price.toLocaleString()}` : 'Recommended';
+        
+        // Generate highlights HTML if available
+        let highlightsHtml = '';
+        if (tour.highlights && tour.highlights.length > 0) {
+            highlightsHtml = '<ul class="package-highlights">' + 
+                tour.highlights.map(h => `<li><i class="ph-fill ph-check-circle"></i> ${h}</li>`).join('') + 
+                '</ul>';
+        }
+        
+        const duration = tour.duration || '3 Nights / 4 Days';
+        
+        card.innerHTML=`
+          <div class="card-img-wrapper">
+            <span class="price-badge">${badgeContent}</span>
+            <img src="${tour.image}" alt="${tour.name}" onerror="this.onerror=null;this.src='https://picsum.photos/id/1043/800/600';" loading="lazy">
+          </div>
+          <div class="card-content">
+            <span class="package-duration"><i class="ph-fill ph-clock"></i> ${duration}</span>
+            <h3>${tour.name}</h3>
+            <div class="stars">${stars}</div>
+            <p>${tour.description}</p>
+            ${highlightsHtml}
+            <button class="book-btn" onclick="openBookingModal('${tour.name.replace(/'/g, "\\'")}')"><i class="ph-bold ph-calendar-plus"></i> Book Now</button>
+          </div>
+        `;
+        container.appendChild(card);
+    });
 }
+
+// Booking Modal Functions
+function openBookingModal(packageName) {
+    document.getElementById('bookingPackage').value = packageName || '';
+    document.getElementById('bookingModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeBookingModal() {
+    document.getElementById('bookingModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside
+document.getElementById('bookingModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeBookingModal();
+    }
+});
+
+// Handle booking form submission
+document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('.booking-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Sending...';
+    btn.disabled = true;
+    
+    // Send to Formspree
+    try {
+        const formData = new FormData(this);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+            btn.innerHTML = '<i class="ph-bold ph-check"></i> Inquiry Sent!';
+            setTimeout(() => {
+                closeBookingModal();
+                this.reset();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('Thank you! Your inquiry has been sent. We will contact you within 24 hours.');
+            }, 1500);
+        } else {
+            throw new Error('Form submission failed');
+        }
+    } catch (err) {
+        console.error('Form error:', err);
+        // Fallback: Send via mailto
+        const name = document.getElementById('bookingName').value;
+        const email = document.getElementById('bookingEmail').value;
+        const phone = document.getElementById('bookingPhone').value;
+        const package_name = document.getElementById('bookingPackage').value;
+        const date = document.getElementById('bookingDate').value;
+        const travelers = document.getElementById('bookingTravelers').value;
+        const requests = document.getElementById('bookingRequests').value;
+        
+        const subject = encodeURIComponent(`New Booking Inquiry - ${package_name}`);
+        const body = encodeURIComponent(
+            `Name: ${name}\n` +
+            `Email: ${email}\n` +
+            `Phone: ${phone}\n` +
+            `Package: ${package_name}\n` +
+            `Travel Date: ${date}\n` +
+            `Travelers: ${travelers}\n` +
+            `Special Requests: ${requests}`
+        );
+        
+        window.open(`mailto:travelkashmir11@gmail.com?subject=${subject}&body=${body}`);
+        btn.innerHTML = '<i class="ph-bold ph-check"></i> Email Opened!';
+        setTimeout(() => {
+            closeBookingModal();
+            this.reset();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 1500);
+    }
+});
+
+// Set minimum date to today
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('bookingDate').setAttribute('min', today);
 
 // Load reviews dynamically
 async function loadReviews() {
