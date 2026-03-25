@@ -60,6 +60,27 @@ th, td { padding: 1.2rem 1rem; border-bottom: 1px solid #e2e8f0; }
 th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;}
 .delete-btn { background: #fee2e2; color: var(--accent-color); border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; display:flex; align-items:center; gap:5px; transition: 0.2s;}
 .delete-btn:hover { background: var(--accent-color); color: white; }
+.edit-btn { background: #dbeafe; color: #2563eb; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; display:flex; align-items:center; gap:5px; transition: 0.2s; margin-right: 0.5rem; }
+.edit-btn:hover { background: #2563eb; color: white; }
+.action-buttons { display: flex; }
+
+/* Edit Modal */
+.edit-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10000; justify-content: center; align-items: center; padding: 1rem; }
+.edit-modal-overlay.active { display: flex; }
+.edit-modal { background: white; border-radius: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.3); animation: modalSlide 0.3s ease; }
+@keyframes modalSlide { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.edit-modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.edit-modal-header h3 { color: var(--primary-color); font-size: 1.3rem; margin: 0; }
+.modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: all 0.3s; }
+.modal-close:hover { background: #f1f5f9; color: var(--primary-color); }
+.edit-modal-body { padding: 2rem; }
+.edit-form .form-group { margin-bottom: 1.5rem; }
+.edit-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; }
+.edit-form input, .edit-form textarea { width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; font-family: inherit; transition: 0.3s; }
+.edit-form input:focus, .edit-form textarea:focus { border-color: var(--secondary-color); outline: none; }
+.edit-form textarea { resize: vertical; min-height: 80px; }
+.save-btn { width: 100%; padding: 1rem; background: var(--secondary-color); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.save-btn:hover { background: var(--primary-color); }
 
 /* Image Upload Styles */
 .image-upload-container { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -280,6 +301,42 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
   </div>
 </main>
 
+<!-- Edit Package Modal -->
+<div class="edit-modal-overlay" id="editModal">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h3><i class="ph-bold ph-pencil"></i> Edit Package</h3>
+      <button class="modal-close" onclick="closeEditModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="edit-modal-body">
+      <form class="edit-form" id="editPackageForm">
+        <input type="hidden" id="editPackageId">
+        <div class="form-group">
+          <label>Package Name</label>
+          <input type="text" id="editPackageName" required>
+        </div>
+        <div class="form-group">
+          <label>Duration (Days)</label>
+          <input type="text" id="editPackageDuration" placeholder="e.g. 3 Nights / 4 Days" required>
+        </div>
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input type="number" id="editPackagePrice" required>
+        </div>
+        <div class="form-group">
+          <label>Rating (1-5)</label>
+          <input type="number" id="editPackageRating" min="1" max="5" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="editPackageDesc" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="save-btn"><i class="ph-bold ph-floppy-disk"></i> Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
 // Supabase Configuration
 const supabaseUrl = 'https://zdtmhcmcngarwieniwgk.supabase.co';
@@ -441,6 +498,73 @@ async function uploadToImgBB(file) {
   }
 }
 
+// Edit Package Functions
+function openEditModal(id, name, duration, price, rating, description) {
+    document.getElementById('editPackageId').value = id;
+    document.getElementById('editPackageName').value = name;
+    document.getElementById('editPackageDuration').value = duration;
+    document.getElementById('editPackagePrice').value = price;
+    document.getElementById('editPackageRating').value = rating;
+    document.getElementById('editPackageDesc').value = description;
+    document.getElementById('editModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close modal when clicking outside
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditModal();
+    }
+});
+
+// Handle edit form submission
+document.getElementById('editPackageForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('.save-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Saving...';
+    btn.disabled = true;
+    
+    const id = parseInt(document.getElementById('editPackageId').value);
+    const updatedPackage = {
+        name: document.getElementById('editPackageName').value,
+        duration: document.getElementById('editPackageDuration').value,
+        price: parseInt(document.getElementById('editPackagePrice').value),
+        rating: parseInt(document.getElementById('editPackageRating').value),
+        description: document.getElementById('editPackageDesc').value
+    };
+    
+    try {
+        const { data, error } = await dbClient.from('tours').update(updatedPackage).eq('id', id).select();
+        
+        if (error) {
+            console.error('Update error:', error);
+            alert("Failed to update package: " + error.message + "\n\nMake sure you have UPDATE permissions in Supabase RLS policies.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+        
+        btn.innerHTML = '<i class="ph-bold ph-check"></i> Saved!';
+        setTimeout(() => {
+            closeEditModal();
+            loadAdminPackages();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 1000);
+    } catch (err) {
+        console.error('Exception:', err);
+        alert("An error occurred while saving: " + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
 // Navigation Logic
 function switchTab(tabId, event) {
   document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
@@ -569,7 +693,12 @@ async function loadAdminPackages() {
       <td>${p.duration || 'N/A'}</td>
       <td>₹${p.price?.toLocaleString() || 'N/A'}</td>
       <td class="stars">${'★'.repeat(p.rating || 5)}</td>
-      <td><button class="delete-btn" onclick="deletePackage(${p.id}, this)"><i class="ph-bold ph-trash"></i> Delete</button></td>
+      <td>
+        <div class="action-buttons">
+          <button class="edit-btn" onclick="openEditModal(${p.id}, '${p.name.replace(/'/g, "\\'")}', '${(p.duration || '').replace(/'/g, "\\'")}', ${p.price}, ${p.rating || 5}, '${(p.description || '').replace(/'/g, "\\'")}')"><i class="ph-bold ph-pencil"></i> Edit</button>
+          <button class="delete-btn" onclick="deletePackage(${p.id}, this)"><i class="ph-bold ph-trash"></i> Delete</button>
+        </div>
+      </td>
     `;
     tbody.appendChild(tr);
   });
