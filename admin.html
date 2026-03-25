@@ -127,6 +127,27 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
         <button type="submit" class="submit-btn"><i class="ph-bold ph-floppy-disk"></i> Save Package to Database</button>
       </form>
     </div>
+    
+    <!-- Existing Packages List -->
+    <div class="card">
+      <h2 style="display:flex; justify-content:space-between; align-items:center;">
+        <span><i class="ph-bold ph-list-dashes"></i> Existing Packages</span>
+        <button onclick="loadAdminPackages()" style="padding:0.5rem; border-radius:8px; border:none; background:#e2e8f0; cursor:pointer;" title="Refresh"><i class="ph-bold ph-arrows-clockwise"></i></button>
+      </h2>
+      <table id="packagesTable">
+        <thead>
+          <tr>
+            <th>Package Name</th>
+            <th>Price (₹)</th>
+            <th>Rating</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="packagesTbody">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Manage Reviews Section -->
@@ -168,6 +189,7 @@ function switchTab(tabId, event) {
   if(event) event.currentTarget.classList.add('active');
   document.getElementById('pageTitle').innerText = tabId === 'packagesTab' ? 'Manage Packages' : 'Manage Reviews';
   if(tabId === 'reviewsTab') loadAdminReviews();
+  if(tabId === 'packagesTab') loadAdminPackages();
 }
 
 // Add Tour logic
@@ -246,6 +268,54 @@ async function deleteReview(id, btnEl) {
     btnEl.disabled = false;
   } else {
     // Beautiful fade out animation
+    const tr = btnEl.closest('tr');
+    tr.style.opacity = '0';
+    setTimeout(() => tr.remove(), 300);
+  }
+}
+
+// Load and Delete Packages logic
+async function loadAdminPackages() {
+  const tbody = document.getElementById('packagesTbody');
+  tbody.innerHTML = '<tr><td colspan="4"><i class="ph-bold ph-spinner ph-spin"></i> Loading packages...</td></tr>';
+  const { data: packages, error } = await dbClient.from('tours').select('*').order('id', {ascending: false});
+  
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="4" style="color:red;">Error loading packages. Are permissions working?</td></tr>`;
+    return;
+  }
+  
+  if (!packages || packages.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No packages found in the database.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  packages.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${p.name}</strong></td>
+      <td>₹${p.price?.toLocaleString() || 'N/A'}</td>
+      <td class="stars">${'★'.repeat(p.rating || 5)}</td>
+      <td><button class="delete-btn" onclick="deletePackage(${p.id}, this)"><i class="ph-bold ph-trash"></i> Delete</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deletePackage(id, btnEl) {
+  if(!confirm("Are you sure you want to permanently delete this package? This cannot be undone.")) return;
+  const original = btnEl.innerHTML;
+  btnEl.innerHTML = 'Deleting...';
+  btnEl.disabled = true;
+
+  const { error } = await dbClient.from('tours').delete().eq('id', id);
+  if (error) {
+    console.error('Delete error', error);
+    alert("Permission Denied: You need to allow public DELETE permissions in your Supabase RLS policies for the tours table.");
+    btnEl.innerHTML = original;
+    btnEl.disabled = false;
+  } else {
     const tr = btnEl.closest('tr');
     tr.style.opacity = '0';
     setTimeout(() => tr.remove(), 300);
