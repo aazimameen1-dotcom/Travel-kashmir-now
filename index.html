@@ -373,58 +373,6 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
 .map-container { border-radius: 16px; overflow: hidden; margin-top: 3rem; box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
 .map-container iframe { width: 100%; height: 400px; border: none; }
 
-/* Testimonials Section */
-.reviews-section { background: linear-gradient(135deg, #0f2e2c 0%, #042f2e 100%); padding: 6rem 2rem; }
-.testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
-.testimonial-card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 40px rgba(0,0,0,0.08); transition: transform 0.3s; }
-.testimonial-card:hover { transform: translateY(-5px); }
-.testimonial-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.guest-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; }
-.guest-info h4 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.25rem; }
-.testimonial-rating { display: flex; gap: 0.25rem; color: #f59e0b; font-size: 0.9rem; margin-bottom: 0.25rem; }
-.review-date { font-size: 0.85rem; color: var(--text-muted); }
-.testimonial-content { position: relative; }
-.testimonial-quote-icon { position: absolute; top: -10px; left: -5px; font-size: 2rem; color: var(--secondary-color); opacity: 0.3; }
-.testimonial-content p { font-size: 1rem; color: var(--text-muted); line-height: 1.7; padding-left: 1.5rem; }
-
-/* Leave Review Section */
-.leave-review-section { text-align: center; margin-top: 3rem; }
-.leave-review-btn { background: white; color: var(--primary-color); border: 2px solid var(--secondary-color); padding: 1rem 2rem; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1rem; }
-.leave-review-btn:hover { background: var(--secondary-color); color: white; }
-
-/* Review Modal */
-.review-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 1rem; }
-.review-modal-overlay.active { display: flex; }
-.review-modal { background: white; border-radius: 24px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.3); animation: modalSlide 0.3s ease; }
-.review-modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-.review-modal-header h3 { color: var(--primary-color); font-size: 1.3rem; margin: 0; }
-.review-modal-body { padding: 2rem; }
-.star-rating-input { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-.star-rating-input i { font-size: 2rem; color: #d1d5db; cursor: pointer; transition: color 0.2s; }
-.star-rating-input i.active { color: #f59e0b; }
-.star-rating-input i:hover { color: #f59e0b; }
-.submit-review-btn { width: 100%; padding: 1rem; background: var(--secondary-color); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-.submit-review-btn:hover { background: var(--primary-color); }
-
-/* Previous Reviews Section */
-.previous-reviews-section { margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.2); }
-.previous-reviews-title { text-align: center; color: white; font-size: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-.previous-reviews-title i { color: #f59e0b; }
-.previous-reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
-.previous-review-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.15); transition: all 0.3s; }
-.previous-review-card:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
-.previous-review-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
-.previous-review-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem; }
-.previous-review-info h4 { font-size: 1rem; color: white; margin-bottom: 0.2rem; }
-.previous-review-rating { display: flex; gap: 0.15rem; color: #f59e0b; font-size: 0.85rem; }
-.previous-review-card p { color: rgba(255,255,255,0.9); font-size: 0.95rem; line-height: 1.6; font-style: italic; }
-.no-reviews-message { text-align: center; color: rgba(255,255,255,0.7); grid-column: 1/-1; padding: 2rem; }
-
-/* Load More Reviews Button */
-.load-more-reviews-btn { display: block; margin: 2rem auto 0; padding: 1rem 2rem; background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 1rem; }
-.load-more-reviews-btn:hover { background: white; color: var(--primary-color); border-color: white; }
-.load-more-reviews-btn i { margin-right: 0.5rem; }
-
 /* Package highlights */
 .package-highlights { list-style: none; padding: 0; margin: 1rem 0; }
 .package-highlights li { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
@@ -549,9 +497,8 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
   .modern-gallery { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
   .modern-gallery img { height: 120px; border-radius: 8px; }
   
-  /* Reviews Section - Dark background */
+  /* Reviews */
   .reviews-section { padding: 2.5rem 1rem; }
-  .reviews-section .section-title { color: white; }
   .review-grid { grid-template-columns: 1fr; gap: 1rem; }
   .review-card { padding: 1.2rem; border-radius: 16px; }
   .review-card h4 { font-size: 1rem; }
@@ -574,27 +521,6 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
   .review-form-container button { padding: 0.9rem; font-size: 1rem; }
   .star-rating-selector { gap: 0.5rem; }
   .star-rating-selector i { font-size: 1.8rem; }
-  
-  /* Testimonials */
-  .testimonials-grid { grid-template-columns: 1fr; gap: 1rem; }
-  .testimonial-card { padding: 1.5rem; }
-  .guest-avatar { width: 45px; height: 45px; font-size: 1.3rem; }
-  .testimonial-content p { padding-left: 1rem; font-size: 0.9rem; }
-  .leave-review-btn { padding: 0.9rem 1.5rem; font-size: 0.95rem; }
-  
-  /* Review modal */
-  .review-modal { border-radius: 20px; }
-  .review-modal-header { padding: 1.2rem 1.5rem; }
-  .review-modal-header h3 { font-size: 1.1rem; }
-  .review-modal-body { padding: 1.5rem; }
-  .star-rating-input i { font-size: 1.5rem; }
-  
-  /* Previous Reviews */
-  .previous-reviews-section { margin-top: 2rem; padding-top: 2rem; }
-  .previous-reviews-title { font-size: 1.2rem; }
-  .previous-reviews-grid { grid-template-columns: 1fr; gap: 1rem; }
-  .previous-review-card { padding: 1.2rem; }
-  .load-more-reviews-btn { padding: 0.9rem 1.5rem; font-size: 0.95rem; }
   
   /* Contact */
   .contact-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -816,150 +742,43 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
     <span class="section-subtitle-badge" style="background: rgba(255,255,255,0.15); color: white;">Testimonials</span>
     <h2 class="section-title">What Our Guests Say</h2>
   </div>
-  
-  <div class="testimonials-grid">
-    <!-- Testimonial 1 -->
-    <div class="testimonial-card">
-      <div class="testimonial-header">
-        <div class="guest-avatar">
-          <i class="ph-fill ph-user"></i>
-        </div>
-        <div class="guest-info">
-          <h4>Rajesh Sharma</h4>
-          <div class="testimonial-rating">
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-          </div>
-          <span class="review-date">January 2026</span>
-        </div>
-      </div>
-      <div class="testimonial-content">
-        <i class="ph-fill ph-quotes testimonial-quote-icon"></i>
-        <p>"Our Kashmir trip was absolutely magical! The houseboat stay on Dal Lake was unforgettable, and the team made sure every detail was perfect. From Gulmarg's snow-capped peaks to Pahalgam's lush valleys, every moment was a dream come true. Highly recommend their services!"</p>
-      </div>
-    </div>
-
-    <!-- Testimonial 2 -->
-    <div class="testimonial-card">
-      <div class="testimonial-header">
-        <div class="guest-avatar">
-          <i class="ph-fill ph-user"></i>
-        </div>
-        <div class="guest-info">
-          <h4>Priya & Arun Patel</h4>
-          <div class="testimonial-rating">
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-          </div>
-          <span class="review-date">December 2025</span>
-        </div>
-      </div>
-      <div class="testimonial-content">
-        <i class="ph-fill ph-quotes testimonial-quote-icon"></i>
-        <p>"We booked our honeymoon package with Travel Kashmir Now and it exceeded all expectations! The romantic dinner on the houseboat, the flower decorations, and the private Shikara ride made our trip incredibly special. Thank you for the memories we'll cherish forever!"</p>
-      </div>
-    </div>
-
-    <!-- Testimonial 3 -->
-    <div class="testimonial-card">
-      <div class="testimonial-header">
-        <div class="guest-avatar">
-          <i class="ph-fill ph-user"></i>
-        </div>
-        <div class="guest-info">
-          <h4>Meera Gupta</h4>
-          <div class="testimonial-rating">
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-          </div>
-          <span class="review-date">February 2026</span>
-        </div>
-      </div>
-      <div class="testimonial-content">
-        <i class="ph-fill ph-quotes testimonial-quote-icon"></i>
-        <p>"Traveling with my elderly parents was a concern, but the team handled everything flawlessly. Comfortable transport, excellent hotel selections, and patient guides made this family trip stress-free. The tulip garden visit was the highlight of our journey!"</p>
-      </div>
-    </div>
-
-    <!-- Testimonial 4 -->
-    <div class="testimonial-card">
-      <div class="testimonial-header">
-        <div class="guest-avatar">
-          <i class="ph-fill ph-user"></i>
-        </div>
-        <div class="guest-info">
-          <h4>Vikram Malhotra</h4>
-          <div class="testimonial-rating">
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-            <i class="ph-fill ph-star"></i>
-          </div>
-          <span class="review-date">January 2026</span>
-        </div>
-      </div>
-      <div class="testimonial-content">
-        <i class="ph-fill ph-quotes testimonial-quote-icon"></i>
-        <p>"As a solo traveler, safety was my priority. The drivers were professional, the hotels were secure, and the 24/7 support gave me peace of mind. The trek to Thajiwas Glacier was breathtaking. I'll definitely be back for another adventure!"</p>
-      </div>
-    </div>
+  <div class="review-grid" id="reviewContainer">
+    <!-- Dynamic Reviews -->
   </div>
   
-  <div class="leave-review-section">
-    <button class="leave-review-btn" onclick="openReviewModal()">
-      <i class="ph-bold ph-pencil-simple"></i> Leave a Review
-    </button>
-  </div>
-  
-  <div class="previous-reviews-section">
-    <h3 class="previous-reviews-title"><i class="ph-bold ph-users"></i> More Reviews from Our Guests</h3>
-    <div class="previous-reviews-grid" id="previousReviewsContainer">
-      <!-- Dynamic reviews from Supabase will load here -->
-    </div>
-    <div id="loadMoreReviewsContainer" style="text-align: center; margin-top: 2rem;"></div>
+  <div style="text-align: center; margin-top: 3rem;">
+    <button onclick="openReviewModal()" class="leave-review-btn"><i class="ph-bold ph-pencil-simple"></i> Leave a Review</button>
   </div>
   
   <!-- Review Modal -->
-  <div class="review-modal-overlay" id="reviewModal">
-    <div class="review-modal">
-      <div class="review-modal-header">
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal">
+      <div class="modal-header">
         <h3><i class="ph-bold ph-star"></i> Share Your Experience</h3>
         <button class="modal-close" onclick="closeReviewModal()"><i class="ph-bold ph-x"></i></button>
       </div>
-      <div class="review-modal-body">
-        <form id="reviewFormModal">
+      <div class="modal-body">
+        <form id="reviewForm">
           <div class="form-group">
             <label>Your Name</label>
-            <input type="text" id="reviewerNameModal" placeholder="Enter your full name" required>
+            <input type="text" id="reviewerName" placeholder="Enter your full name" required>
+          </div>
+          <div class="form-group">
+            <label>Your Review</label>
+            <textarea id="reviewText" rows="4" placeholder="Tell us about your trip to Kashmir..." required></textarea>
           </div>
           <div class="form-group">
             <label>Your Rating</label>
-            <div class="star-rating-input" id="starInputModal">
+            <div class="star-rating-selector" id="starSelector">
               <i class="ph-fill ph-star active" data-val="1"></i>
               <i class="ph-fill ph-star active" data-val="2"></i>
               <i class="ph-fill ph-star active" data-val="3"></i>
               <i class="ph-fill ph-star active" data-val="4"></i>
               <i class="ph-fill ph-star active" data-val="5"></i>
             </div>
-            <input type="hidden" id="reviewRatingModal" value="5">
+            <input type="hidden" id="reviewRating" value="5">
           </div>
-          <div class="form-group">
-            <label>Your Review</label>
-            <textarea id="reviewTextModal" rows="4" placeholder="Tell us about your experience with Travel Kashmir Now..." required></textarea>
-          </div>
-          <button type="submit" class="submit-review-btn">
-            <i class="ph-bold ph-paper-plane-right"></i> Submit Review
-          </button>
+          <button type="submit" class="booking-btn"><i class="ph-bold ph-paper-plane-right"></i> Publish Review</button>
         </form>
       </div>
     </div>
@@ -1308,93 +1127,82 @@ document.getElementById('bookingForm').addEventListener('submit', async function
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('bookingDate').setAttribute('min', today);
 
+// Default testimonials to show when database is empty
+const defaultReviews = [
+  {
+    name: "Priya Sharma",
+    review: "Our Kashmir trip was absolutely magical! The houseboat stay on Dal Lake, the gondola ride in Gulmarg, and the warm hospitality exceeded all expectations. Highly recommend this team!",
+    rating: 5,
+    date: "2026-02-15"
+  },
+  {
+    name: "Rahul & Ananya",
+    review: "Perfect honeymoon experience! They arranged candlelight dinners, decorated our room with flowers, and the private shikara ride was so romantic. Thank you for the memories!",
+    rating: 5,
+    date: "2026-01-20"
+  },
+  {
+    name: "Vikram Patel",
+    review: "Traveled with my family of 5 and everyone had a great time. The drivers were professional, hotels were clean and comfortable. Kids loved the snow activities in Gulmarg!",
+    rating: 5,
+    date: "2025-12-28"
+  },
+  {
+    name: "Sarah Johnson",
+    review: "As a solo traveler from the UK, I felt completely safe and well taken care of. The guides spoke excellent English and showed me hidden gems not on the tourist maps.",
+    rating: 5,
+    date: "2025-11-10"
+  }
+];
+
 // Load reviews dynamically
-let allReviews = [];
-let displayedReviewCount = 0;
-const REVIEWS_PER_BATCH = 6;
-
 async function loadReviews() {
-    const container = document.getElementById('previousReviewsContainer');
-    container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-spinner ph-spin"></i> Loading reviews...</p>';
+    const { data: reviews, error } = await dbClient.from('reviews').select('*').order('id',{ascending:false});
+    const container = document.getElementById('reviewContainer');
+    container.innerHTML = '';
     
-    try {
-        console.log('Fetching reviews from Supabase...');
-        const { data: reviews, error } = await dbClient.from('reviews').select('*').order('created_at', { ascending: false });
-        
-        console.log('Supabase response:', { reviews, error });
-        
-        if (error) {
-            console.error('Error loading reviews:', error);
-            container.innerHTML = `<p class="no-reviews-message">
-                <i class="ph-bold ph-warning"></i> Unable to load reviews.<br>
-                <small>Error: ${error.message}</small><br>
-                <small style="font-size: 0.8rem;">Check RLS policies in Supabase</small>
-            </p>`;
-            return;
-        }
-        
-        if (reviews && reviews.length > 0) {
-            console.log(`Loaded ${reviews.length} total reviews`);
-            allReviews = reviews;
-            displayedReviewCount = 0;
-            displayReviewsBatch();
-        } else {
-            console.log('No reviews found in database');
-            container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-info"></i> No reviews yet. Be the first to share your experience!</p>';
-        }
-    } catch (err) {
-        console.error('Failed to load reviews:', err);
-        container.innerHTML = `<p class="no-reviews-message">
-            <i class="ph-bold ph-warning"></i> Error loading reviews.<br>
-            <small>${err.message}</small>
-        </p>`;
-    }
-}
-
-function displayReviewsBatch() {
-    const container = document.getElementById('previousReviewsContainer');
+    // Use default reviews if database is empty
+    const displayReviews = (reviews && reviews.length > 0) ? reviews : defaultReviews;
     
-    // Clear container on first batch
-    if (displayedReviewCount === 0) {
-        container.innerHTML = '';
-    }
-    
-    const nextBatch = allReviews.slice(displayedReviewCount, displayedReviewCount + REVIEWS_PER_BATCH);
-    
-    nextBatch.forEach(r => {
+    displayReviews.forEach(r => {
         const card = document.createElement('div');
-        card.className = 'previous-review-card';
-        const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
+        card.className = 'review-card';
+        const stars = '★'.repeat(r.rating || 5);
         const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
+        const dateStr = r.date || (r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recently');
+        
         card.innerHTML = `
-          <div class="previous-review-header">
-            <div class="previous-review-avatar">${initial}</div>
-            <div class="previous-review-info">
-              <h4>${r.name || 'Guest'}</h4>
-              <div class="previous-review-rating">${stars}</div>
+          <div class="review-header">
+            <div class="avatar">${initial}</div>
+            <div class="review-meta">
+              <h4>${r.name}</h4>
+              <div class="review-stars">${stars}</div>
+              <span class="review-date"><i class="ph-bold ph-calendar-blank"></i> ${dateStr}</span>
             </div>
           </div>
-          <p>"${r.review || 'No review text'}"</p>
+          <p class="review-text">"${r.review}"</p>
         `;
         container.appendChild(card);
     });
-    
-    displayedReviewCount += nextBatch.length;
-    
-    // Remove existing load more button if present
-    const btnContainer = document.getElementById('loadMoreReviewsContainer');
-    btnContainer.innerHTML = '';
-    
-    // Add load more button if there are more reviews
-    if (displayedReviewCount < allReviews.length) {
-        const loadMoreBtn = document.createElement('button');
-        loadMoreBtn.id = 'loadMoreReviewsBtn';
-        loadMoreBtn.className = 'load-more-reviews-btn';
-        loadMoreBtn.innerHTML = `<i class="ph-bold ph-caret-down"></i> Load More Reviews (${allReviews.length - displayedReviewCount} more)`;
-        loadMoreBtn.onclick = displayReviewsBatch;
-        btnContainer.appendChild(loadMoreBtn);
-    }
 }
+
+// Review Modal Functions
+function openReviewModal() {
+    document.getElementById('reviewModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close review modal when clicking outside
+document.getElementById('reviewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReviewModal();
+    }
+});
 
 // Submit Review
 document.getElementById('reviewForm').addEventListener('submit', async e=>{
@@ -1485,79 +1293,6 @@ document.getElementById('contactForm').addEventListener('submit', async function
             btn.innerHTML = originalText;
             btn.disabled = false;
         }, 2000);
-    }
-});
-
-// Review Modal Functions
-function openReviewModal() {
-    document.getElementById('reviewModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeReviewModal() {
-    document.getElementById('reviewModal').classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-// Close modal when clicking outside
-document.getElementById('reviewModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeReviewModal();
-    }
-});
-
-// Interactive Star Rating for Modal
-const modalStarIcons = document.querySelectorAll('#starInputModal i');
-const modalRatingInput = document.getElementById('reviewRatingModal');
-
-modalStarIcons.forEach(star => {
-    star.addEventListener('click', (e) => {
-        const val = parseInt(e.target.getAttribute('data-val'));
-        modalRatingInput.value = val;
-        modalStarIcons.forEach(s => {
-            if (parseInt(s.getAttribute('data-val')) <= val) s.classList.add('active');
-            else s.classList.remove('active');
-        });
-    });
-});
-
-// Submit Review from Modal
-document.getElementById('reviewFormModal').addEventListener('submit', async e => {
-    e.preventDefault();
-    const btn = e.target.querySelector('.submit-review-btn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Submitting...';
-    btn.disabled = true;
-
-    try {
-        const name = document.getElementById('reviewerNameModal').value;
-        const review = document.getElementById('reviewTextModal').value;
-        const rating = parseInt(document.getElementById('reviewRatingModal').value) || 5;
-        const { error } = await dbClient.from('reviews').insert([{name, review, rating}]);
-        
-        if (error) {
-            console.error('Supabase Error:', error);
-            alert("Failed to publish review. Please try again.");
-            throw error;
-        }
-        
-        document.getElementById('reviewFormModal').reset();
-        // Reset stars to 5
-        modalRatingInput.value = 5;
-        modalStarIcons.forEach(s => s.classList.add('active'));
-        
-        btn.innerHTML = '<i class="ph-bold ph-check"></i> Published!';
-        setTimeout(() => {
-            closeReviewModal();
-            loadReviews();
-        }, 1000);
-    } catch (err) {
-        btn.innerHTML = '<i class="ph-bold ph-warning"></i> Error';
-    } finally {
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 3000);
     }
 });
 
