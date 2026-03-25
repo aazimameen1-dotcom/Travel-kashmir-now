@@ -369,48 +369,60 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
 
 /* Mobile Styles - phones */
 @media(max-width: 768px) {
+  nav { padding: 1.2rem 1.5rem; }
   .brand { font-size: 1.4rem; }
   .brand i { font-size: 1.8rem; }
-  .hero-content h1 { font-size: 2.5rem; }
-  .hero-content p { font-size: 1.1rem; }
+  .hero-content h1 { font-size: 2.8rem; }
+  .hero-content p { font-size: 1.15rem; }
   .cta-group { flex-direction: column; gap: 1rem; }
-  .cta-primary, .cta-secondary { width: 100%; justify-content: center; }
+  .cta-primary, .cta-secondary { width: 100%; justify-content: center; padding: 1.2rem; font-size: 1.1rem; }
   .hero-visuals { height: 350px; }
-  .features { grid-template-columns: 1fr; margin: 0 1rem 2rem; padding: 2rem 1rem; }
-  .grid-container { grid-template-columns: 1fr; }
+  .features { grid-template-columns: 1fr; margin: 0 1rem 2rem; padding: 2.5rem 1.5rem; border-radius: 24px;}
+  .grid-container { grid-template-columns: 1fr; gap: 2rem; }
   .section-title { font-size: 2.2rem; }
+  section { padding: 4rem 1.5rem; }
   .contact-grid { grid-template-columns: 1fr; }
-  .floating-actions { bottom: 1rem; right: 1rem; }
-  .floating-actions .action-btn { padding: 0.8rem 1.2rem; font-size: 0.9rem; }
-  .action-btn i { font-size: 1.2rem; }
-  .modern-gallery { grid-template-columns: 1fr; }
+  .floating-actions { bottom: 1.5rem; right: 1.5rem; gap: 0.8rem; }
+  .floating-actions .action-btn { padding: 1rem 1.4rem; font-size: 1rem; }
+  .action-btn i { font-size: 1.4rem; }
+  .modern-gallery { grid-template-columns: 1fr; gap: 1rem; }
   .modern-gallery .g-1, .modern-gallery .g-2, .modern-gallery .g-3, .modern-gallery .g-4 {
     grid-column: 1;
     grid-row: auto;
   }
-  .review-grid { grid-template-columns: 1fr; }
-  .review-form-container { padding: 2rem 1.5rem; }
-  .cab-item { flex-direction: column; text-align: center; }
-  .cab-item-icon { margin: 0 auto 1rem; }
+  .review-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .review-form-container { padding: 2.5rem 1.5rem; border-radius: 24px; }
+  .cab-item { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
+  .cab-item-icon { margin: 0 auto 1.5rem; }
   
   /* Mobile Menu */
-  .mobile-menu-btn { display: block; background: none; border: none; font-size: 2rem; color: var(--primary-color); cursor: pointer; }
+  .mobile-menu-btn { display: block; background: none; border: none; font-size: 2.2rem; color: var(--primary-color); cursor: pointer; padding: 0.5rem; border-radius: 8px; }
+  .mobile-menu-btn:active { background: rgba(0,0,0,0.05); }
   .nav-links { 
-    position: fixed; top: 70px; left: 0; right: 0; background: white; 
-    flex-direction: column; padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    display: none; z-index: 999;
+    position: fixed; top: 80px; left: 5%; right: 5%; background: rgba(255,255,255,0.95); 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    flex-direction: column; padding: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    display: flex; opacity: 0; transform: translateY(-20px); pointer-events: none;
+    z-index: 999; border-radius: 24px; border: 1px solid rgba(255,255,255,0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .nav-links.active { display: flex; }
-  .nav-links a { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
+  .nav-links.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .nav-links a { padding: 1.2rem; font-size: 1.2rem; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.05); border-radius: 12px; transition: 0.2s;}
+  .nav-links a:last-child { border-bottom: none; }
+  .nav-links a:active { background: rgba(0,0,0,0.05); }
 }
 
 /* Small phones */
 @media(max-width: 480px) {
   header { padding: 8rem 1rem 3rem; }
-  .hero-content h1 { font-size: 2rem; }
+  .hero-content h1 { font-size: 2.2rem; margin-bottom: 1rem; }
   .section-title { font-size: 1.8rem; }
-  .card-content h3 { font-size: 1.3rem; }
-  .price-badge { font-size: 1rem; padding: 0.6rem 1rem; }
+  .card-content h3 { font-size: 1.4rem; }
+  .price-badge { font-size: 1.1rem; padding: 0.5rem 1rem; }
+  .hero-visuals { height: 300px; }
+  form input, form textarea { font-size: 16px; padding: 1.2rem; /* force 16px to prevent zoom in iOS */ }
+  form button { font-size: 1.15rem; padding: 1.2rem; }
+  .star-rating-selector i { font-size: 2.4rem; }
 }
 
 /* Hide mobile menu button on desktop */
