@@ -926,6 +926,7 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
     <div class="previous-reviews-grid" id="previousReviewsContainer">
       <!-- Dynamic reviews from Supabase will load here -->
     </div>
+    <div id="loadMoreReviewsContainer" style="text-align: center; margin-top: 2rem;"></div>
   </div>
   
   <!-- Review Modal -->
@@ -1381,10 +1382,8 @@ function displayReviewsBatch() {
     displayedReviewCount += nextBatch.length;
     
     // Remove existing load more button if present
-    const existingBtn = document.getElementById('loadMoreReviewsBtn');
-    if (existingBtn) {
-        existingBtn.remove();
-    }
+    const btnContainer = document.getElementById('loadMoreReviewsContainer');
+    btnContainer.innerHTML = '';
     
     // Add load more button if there are more reviews
     if (displayedReviewCount < allReviews.length) {
@@ -1393,7 +1392,7 @@ function displayReviewsBatch() {
         loadMoreBtn.className = 'load-more-reviews-btn';
         loadMoreBtn.innerHTML = `<i class="ph-bold ph-caret-down"></i> Load More Reviews (${allReviews.length - displayedReviewCount} more)`;
         loadMoreBtn.onclick = displayReviewsBatch;
-        container.parentElement.appendChild(loadMoreBtn);
+        btnContainer.appendChild(loadMoreBtn);
     }
 }
 
