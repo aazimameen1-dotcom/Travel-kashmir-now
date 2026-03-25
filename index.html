@@ -300,7 +300,35 @@ form textarea { min-height: 150px; resize: vertical;}
 .star-rating-selector i { color: #cbd5e1; font-size: 2.8rem; cursor: pointer; transition: color 0.2s, transform 0.2s; }
 .star-rating-selector i:hover { transform: scale(1.1); }
 .star-rating-selector i.active { color: var(--accent-color); }
-/* End Rating */
+/* Review Image Upload Styles */
+.review-image-upload { margin-bottom: 1.5rem; }
+.image-upload-wrapper { text-align: center; }
+.image-upload-label {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.8rem 1.5rem; background: var(--bg-color); color: var(--text-muted);
+  border-radius: 12px; cursor: pointer; font-weight: 600;
+  border: 2px dashed #e2e8f0; transition: all 0.3s;
+}
+.image-upload-label:hover { border-color: var(--secondary-color); color: var(--secondary-color); background: rgba(15, 118, 110, 0.05); }
+.image-preview {
+  position: relative; display: inline-block; margin-top: 1rem;
+  max-width: 200px; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.image-preview img { width: 100%; height: 150px; object-fit: cover; display: block; }
+.remove-image-btn {
+  position: absolute; top: 5px; right: 5px;
+  background: rgba(0,0,0,0.6); color: white;
+  border: none; width: 28px; height: 28px; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; transition: background 0.3s;
+}
+.remove-image-btn:hover { background: rgba(220, 38, 38, 0.8); }
+.review-card-image {
+  width: 100%; height: 180px; object-fit: cover;
+  border-radius: 12px; margin: 1rem 0;
+}
+/* End Review Image Upload */
 form button {
   width: 100%; padding: 1.4rem; background: var(--secondary-color); color: white; font-weight: 700;
   font-size: 1.2rem; border: none; border-radius: 16px; cursor: pointer; transition: all 0.3s;
@@ -756,6 +784,21 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
       <input type="text" id="reviewerName" placeholder="Your Full Name" required>
       <textarea id="reviewText" placeholder="Tell us about your trip to Kashmir..." required></textarea>
       
+      <!-- Image Upload -->
+      <div class="review-image-upload">
+        <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">Add a photo (optional):</p>
+        <div class="image-upload-wrapper">
+          <input type="file" id="reviewImage" accept="image/*" hidden>
+          <label for="reviewImage" class="image-upload-label">
+            <i class="ph-bold ph-camera"></i> <span id="imageLabel">Choose Photo</span>
+          </label>
+          <div id="imagePreview" class="image-preview" style="display: none;">
+            <img src="" alt="Preview">
+            <button type="button" class="remove-image-btn" onclick="clearReviewImage()"><i class="ph-bold ph-x"></i></button>
+          </div>
+        </div>
+      </div>
+      
       <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">Rate your experience:</p>
       <div class="star-rating-selector" id="starSelector">
         <i class="ph-fill ph-star active" data-val="1"></i>
@@ -765,6 +808,7 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
         <i class="ph-fill ph-star active" data-val="5"></i>
       </div>
       <input type="hidden" id="reviewRating" value="5">
+      <input type="hidden" id="reviewImageData" value="">
 
       <button type="submit"><i class="ph-bold ph-paper-plane-right"></i> Publish Review</button>
     </form>
@@ -1158,6 +1202,7 @@ function displayMoreReviews() {
         card.className = 'review-card';
         const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
         const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
+        const imageHtml = r.image ? `<img src="${r.image}" alt="Review photo" class="review-card-image" onerror="this.style.display='none'">` : '';
         card.innerHTML = `
           <div class="review-header">
             <div class="avatar">${initial}</div>
@@ -1167,6 +1212,7 @@ function displayMoreReviews() {
             </div>
           </div>
           <p>"${r.review}"</p>
+          ${imageHtml}
         `;
         container.appendChild(card);
     });
@@ -1187,6 +1233,36 @@ document.getElementById('loadMoreReviewsBtn').addEventListener('click', function
     displayMoreReviews();
 });
 
+// Review Image Upload Handler
+document.getElementById('reviewImage').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+        alert('Image size must be less than 2MB');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const imageData = event.target.result;
+        document.getElementById('reviewImageData').value = imageData;
+        document.getElementById('imagePreview').style.display = 'inline-block';
+        document.getElementById('imagePreview').querySelector('img').src = imageData;
+        document.getElementById('imageLabel').textContent = 'Change Photo';
+    };
+    reader.readAsDataURL(file);
+});
+
+function clearReviewImage() {
+    document.getElementById('reviewImage').value = '';
+    document.getElementById('reviewImageData').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('imagePreview').querySelector('img').src = '';
+    document.getElementById('imageLabel').textContent = 'Choose Photo';
+}
+
 // Submit Review
 document.getElementById('reviewForm').addEventListener('submit', async e=>{
     e.preventDefault();
@@ -1199,7 +1275,12 @@ document.getElementById('reviewForm').addEventListener('submit', async e=>{
         const name=document.getElementById('reviewerName').value;
         const review=document.getElementById('reviewText').value;
         const rating=parseInt(document.getElementById('reviewRating').value) || 5;
-        const { error } = await dbClient.from('reviews').insert([{name,review,rating:rating}]);
+        const image = document.getElementById('reviewImageData').value || null;
+        
+        const reviewData = {name, review, rating};
+        if (image) reviewData.image = image;
+        
+        const { error } = await dbClient.from('reviews').insert([reviewData]);
         
         if (error) {
             console.error('Supabase Error:', error);
@@ -1208,6 +1289,11 @@ document.getElementById('reviewForm').addEventListener('submit', async e=>{
         }
         
         document.getElementById('reviewForm').reset();
+        clearReviewImage();
+        // Reset stars
+        document.getElementById('reviewRating').value = 5;
+        document.querySelectorAll('#starSelector i').forEach(s => s.classList.add('active'));
+        
         btn.innerHTML = '<i class="ph-bold ph-check"></i> Published!';
         loadReviews();
     } catch (err) {
