@@ -71,8 +71,13 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
 .upload-status.error { color: var(--accent-color); }
 .image-preview img { border: 2px solid #e2e8f0; }
 
-.section { display: none; }
-.section.active { display: block; }
+/* Image upload tabs */
+.image-upload-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.tab-btn { padding: 0.6rem 1.2rem; border: 2px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.tab-btn:hover { border-color: var(--secondary-color); }
+.tab-btn.active { background: var(--secondary-color); color: white; border-color: var(--secondary-color); }
+.image-section { display: none; }
+.image-section.active { display: block; }
 .stars { color: #f59e0b; font-size: 1.2rem; letter-spacing: 2px;}
 .alert-box { background: #fef9c3; color: #d97706; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #fde68a; display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem;}
 
@@ -190,14 +195,26 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
         </div>
         <div class="form-group full-width">
           <label>Cover Image</label>
-          <div class="image-upload-container">
-            <input type="file" id="tourImageFile" accept="image/*" class="image-file-input">
-            <div class="image-preview" id="imagePreview">
-              <img id="previewImg" src="" alt="Preview" style="display:none; max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 10px;">
-            </div>
-            <input type="hidden" id="tourImage" required>
+          <div class="image-upload-tabs">
+            <button type="button" class="tab-btn active" id="fileTab" onclick="switchImageTab('file')">Upload File</button>
+            <button type="button" class="tab-btn" id="urlTab" onclick="switchImageTab('url')">Use URL</button>
           </div>
-          <small class="upload-status" id="uploadStatus">Select an image to upload</small>
+          
+          <div id="fileUploadSection" class="image-section active">
+            <div class="image-upload-container">
+              <input type="file" id="tourImageFile" accept="image/*" class="image-file-input">
+              <div class="image-preview" id="imagePreview">
+                <img id="previewImg" src="" alt="Preview" style="display:none; max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 10px;">
+              </div>
+              <input type="hidden" id="tourImage" required>
+            </div>
+            <small class="upload-status" id="uploadStatus">Select an image to upload (auto-compressed if large)</small>
+          </div>
+          
+          <div id="urlSection" class="image-section" style="display:none;">
+            <input type="text" id="tourImageUrlInput" placeholder="https://example.com/image.jpg" style="width:100%; padding:1rem; border-radius:12px; border:2px solid #e2e8f0;">
+            <small style="color:var(--text-muted); font-size:0.85rem; margin-top:0.5rem; display:block;">Paste a direct image URL from imgur, imgbb, or any image hosting service</small>
+          </div>
         </div>
         <div class="form-group">
           <label>Price (₹)</label>
@@ -269,27 +286,118 @@ const imageFileInput = document.getElementById('tourImageFile');
 const tourImageUrl = document.getElementById('tourImage');
 const previewImg = document.getElementById('previewImg');
 const uploadStatus = document.getElementById('uploadStatus');
+const tourImageUrlInput = document.getElementById('tourImageUrlInput');
 
-imageFileInput.addEventListener('change', function(e) {
+// Switch between file upload and URL input
+function switchImageTab(tab) {
+  if (tab === 'file') {
+    document.getElementById('fileTab').classList.add('active');
+    document.getElementById('urlTab').classList.remove('active');
+    document.getElementById('fileUploadSection').classList.add('active');
+    document.getElementById('fileUploadSection').style.display = 'block';
+    document.getElementById('urlSection').classList.remove('active');
+    document.getElementById('urlSection').style.display = 'none';
+    tourImageUrlInput.value = '';
+  } else {
+    document.getElementById('fileTab').classList.remove('active');
+    document.getElementById('urlTab').classList.add('active');
+    document.getElementById('fileUploadSection').classList.remove('active');
+    document.getElementById('fileUploadSection').style.display = 'none';
+    document.getElementById('urlSection').classList.add('active');
+    document.getElementById('urlSection').style.display = 'block';
+  }
+}
+
+// URL input handler
+tourImageUrlInput.addEventListener('input', function(e) {
+  const url = e.target.value;
+  if (url) {
+    previewImg.src = url;
+    previewImg.style.display = 'block';
+    tourImageUrl.value = url;
+    uploadStatus.textContent = 'Image URL set';
+    uploadStatus.className = 'upload-status success';
+  }
+});
+
+// Compress image using canvas
+function compressImage(base64, maxWidth = 1200, maxHeight = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = function() {
+      let width = img.width;
+      let height = img.height;
+      
+      // Calculate new dimensions
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      if (height > maxHeight) {
+        width = Math.round((width * maxHeight) / height);
+        height = maxHeight;
+      }
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Get compressed base64
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedBase64);
+    };
+    img.onerror = reject;
+    img.src = base64;
+  });
+}
+
+imageFileInput.addEventListener('change', async function(e) {
   const file = e.target.files[0];
   if (!file) return;
 
   // Show preview
   const reader = new FileReader();
-  reader.onload = function(event) {
-    previewImg.src = event.target.result;
+  reader.onload = async function(event) {
+    const originalBase64 = event.target.result;
+    previewImg.src = originalBase64;
     previewImg.style.display = 'block';
-    uploadStatus.textContent = 'Image selected - ready to upload';
-    uploadStatus.className = 'upload-status success';
     
-    // For demo: store base64 (in production, upload to Cloudinary/ImgBB/Supabase Storage)
-    // Limit: Only use for small images (< 500KB) to avoid DB issues
-    if (file.size < 500000) {
-      tourImageUrl.value = event.target.result; // Base64 for small images
+    // Check size and compress if needed
+    const originalSize = originalBase64.length * 0.75; // Approximate bytes
+    const maxSize = 800000; // ~800KB max for database
+    
+    if (originalSize > maxSize) {
+      uploadStatus.textContent = 'Compressing image...';
+      uploadStatus.className = 'upload-status uploading';
+      
+      try {
+        // Compress the image
+        const compressed = await compressImage(originalBase64, 1200, 800, 0.7);
+        const compressedSize = compressed.length * 0.75;
+        
+        if (compressedSize > maxSize) {
+          // Try more aggressive compression
+          const moreCompressed = await compressImage(originalBase64, 800, 600, 0.5);
+          tourImageUrl.value = moreCompressed;
+          uploadStatus.textContent = `Image compressed and ready (${Math.round(moreCompressed.length * 0.75 / 1024)}KB)`;
+        } else {
+          tourImageUrl.value = compressed;
+          uploadStatus.textContent = `Image compressed and ready (${Math.round(compressedSize / 1024)}KB)`;
+        }
+        uploadStatus.className = 'upload-status success';
+      } catch (err) {
+        console.error('Compression error:', err);
+        uploadStatus.textContent = 'Compression failed. Use URL option for large images.';
+        uploadStatus.className = 'upload-status error';
+        tourImageUrl.value = '';
+      }
     } else {
-      uploadStatus.textContent = 'Image too large. Please use URL option or compress image.';
-      uploadStatus.className = 'upload-status error';
-      tourImageUrl.value = '';
+      // Small enough, use as-is
+      tourImageUrl.value = originalBase64;
+      uploadStatus.textContent = `Image ready (${Math.round(originalSize / 1024)}KB)`;
+      uploadStatus.className = 'upload-status success';
     }
   };
   reader.readAsDataURL(file);
