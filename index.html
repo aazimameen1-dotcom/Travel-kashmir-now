@@ -405,6 +405,20 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
 .submit-review-btn { width: 100%; padding: 1rem; background: var(--secondary-color); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
 .submit-review-btn:hover { background: var(--primary-color); }
 
+/* Previous Reviews Section */
+.previous-reviews-section { margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.2); }
+.previous-reviews-title { text-align: center; color: white; font-size: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.previous-reviews-title i { color: #f59e0b; }
+.previous-reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+.previous-review-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.15); transition: all 0.3s; }
+.previous-review-card:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+.previous-review-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.previous-review-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem; }
+.previous-review-info h4 { font-size: 1rem; color: white; margin-bottom: 0.2rem; }
+.previous-review-rating { display: flex; gap: 0.15rem; color: #f59e0b; font-size: 0.85rem; }
+.previous-review-card p { color: rgba(255,255,255,0.9); font-size: 0.95rem; line-height: 1.6; font-style: italic; }
+.no-reviews-message { text-align: center; color: rgba(255,255,255,0.7); grid-column: 1/-1; padding: 2rem; }
+
 /* Package highlights */
 .package-highlights { list-style: none; padding: 0; margin: 1rem 0; }
 .package-highlights li { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
@@ -567,6 +581,12 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
   .review-modal-header h3 { font-size: 1.1rem; }
   .review-modal-body { padding: 1.5rem; }
   .star-rating-input i { font-size: 1.5rem; }
+  
+  /* Previous Reviews */
+  .previous-reviews-section { margin-top: 2rem; padding-top: 2rem; }
+  .previous-reviews-title { font-size: 1.2rem; }
+  .previous-reviews-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .previous-review-card { padding: 1.2rem; }
   
   /* Contact */
   .contact-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -891,6 +911,13 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
     <button class="leave-review-btn" onclick="openReviewModal()">
       <i class="ph-bold ph-pencil-simple"></i> Leave a Review
     </button>
+  </div>
+  
+  <div class="previous-reviews-section">
+    <h3 class="previous-reviews-title"><i class="ph-bold ph-users"></i> More Reviews from Our Guests</h3>
+    <div class="previous-reviews-grid" id="previousReviewsContainer">
+      <!-- Dynamic reviews from Supabase will load here -->
+    </div>
   </div>
   
   <!-- Review Modal -->
@@ -1275,24 +1302,21 @@ document.getElementById('bookingDate').setAttribute('min', today);
 // Load reviews dynamically
 async function loadReviews() {
     const { data: reviews, error } = await dbClient.from('reviews').select('*').order('id',{ascending:false});
-    const container = document.getElementById('reviewContainer');
+    const container = document.getElementById('previousReviewsContainer');
     container.innerHTML = '';
     
-    // Display top 6 reviews to maintain grid structure
-    const displayReviews = reviews ? reviews.slice(0, 6) : [];
-    
-    if(!error && displayReviews.length>0){
-        displayReviews.forEach(r=>{
-            const card=document.createElement('div');
-            card.className='review-card';
-            const stars=r.rating ? '★'.repeat(r.rating) : '★★★★★';
+    if(!error && reviews && reviews.length > 0){
+        reviews.forEach(r => {
+            const card = document.createElement('div');
+            card.className = 'previous-review-card';
+            const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
             const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
-            card.innerHTML=`
-              <div class="review-header">
-                <div class="avatar">${initial}</div>
-                <div>
+            card.innerHTML = `
+              <div class="previous-review-header">
+                <div class="previous-review-avatar">${initial}</div>
+                <div class="previous-review-info">
                   <h4>${r.name}</h4>
-                  <div class="stars" style="color: #f59e0b; font-size: 1.2rem; letter-spacing: 3px; margin:0;">${stars}</div>
+                  <div class="previous-review-rating">${stars}</div>
                 </div>
               </div>
               <p>"${r.review}"</p>
@@ -1300,7 +1324,7 @@ async function loadReviews() {
             container.appendChild(card);
         });
     } else {
-        container.innerHTML='<p style="text-align:center;width:100%;grid-column:1/-1; color: rgba(255,255,255,0.8);">No reviews yet. Be our first reviewer!</p>';
+        container.innerHTML = '<p class="no-reviews-message">Be the first to share your experience!</p>';
     }
 }
 
