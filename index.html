@@ -746,6 +746,10 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
     <!-- Dynamic Reviews -->
   </div>
   
+  <div style="text-align: center; margin: 2rem 0;">
+    <button id="loadMoreReviewsBtn" class="cta-primary btn-text" style="display: none;"><i class="ph-bold ph-plus-circle"></i> Load More Reviews</button>
+  </div>
+  
   <div class="review-form-container">
     <h3>Share Your Experience</h3>
     <form id="reviewForm">
@@ -1109,37 +1113,79 @@ document.getElementById('bookingForm').addEventListener('submit', async function
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('bookingDate').setAttribute('min', today);
 
-// Load reviews dynamically
+// Load reviews dynamically with pagination
+let allReviews = [];
+let displayedReviewCount = 0;
+const REVIEWS_PER_PAGE = 6;
+
 async function loadReviews() {
     const { data: reviews, error } = await dbClient.from('reviews').select('*').order('id',{ascending:false});
     const container = document.getElementById('reviewContainer');
+    const loadMoreBtn = document.getElementById('loadMoreReviewsBtn');
+    
+    if (error) {
+        container.innerHTML = '<p style="text-align:center;width:100%;grid-column:1/-1; color: rgba(255,255,255,0.8);">Error loading reviews.</p>';
+        loadMoreBtn.style.display = 'none';
+        return;
+    }
+    
+    if (!reviews || reviews.length === 0) {
+        container.innerHTML = '<p style="text-align:center;width:100%;grid-column:1/-1; color: rgba(255,255,255,0.8);">No reviews yet. Be our first reviewer!</p>';
+        loadMoreBtn.style.display = 'none';
+        return;
+    }
+    
+    // Store all reviews
+    allReviews = reviews;
+    
+    // Clear container and reset display count
     container.innerHTML = '';
+    displayedReviewCount = 0;
     
-    // Display top 6 reviews to maintain grid structure
-    const displayReviews = reviews ? reviews.slice(0, 6) : [];
+    // Display first batch
+    displayMoreReviews();
+}
+
+function displayMoreReviews() {
+    const container = document.getElementById('reviewContainer');
+    const loadMoreBtn = document.getElementById('loadMoreReviewsBtn');
     
-    if(!error && displayReviews.length>0){
-        displayReviews.forEach(r=>{
-            const card=document.createElement('div');
-            card.className='review-card';
-            const stars=r.rating ? '★'.repeat(r.rating) : '★★★★★';
-            const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
-            card.innerHTML=`
-              <div class="review-header">
-                <div class="avatar">${initial}</div>
-                <div>
-                  <h4>${r.name}</h4>
-                  <div class="stars" style="color: #f59e0b; font-size: 1.2rem; letter-spacing: 3px; margin:0;">${stars}</div>
-                </div>
-              </div>
-              <p>"${r.review}"</p>
-            `;
-            container.appendChild(card);
-        });
+    // Get the next batch of reviews
+    const reviewsToDisplay = allReviews.slice(displayedReviewCount, displayedReviewCount + REVIEWS_PER_PAGE);
+    
+    reviewsToDisplay.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'review-card';
+        const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
+        const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
+        card.innerHTML = `
+          <div class="review-header">
+            <div class="avatar">${initial}</div>
+            <div>
+              <h4>${r.name}</h4>
+              <div class="stars" style="color: #f59e0b; font-size: 1.2rem; letter-spacing: 3px; margin:0;">${stars}</div>
+            </div>
+          </div>
+          <p>"${r.review}"</p>
+        `;
+        container.appendChild(card);
+    });
+    
+    // Update displayed count
+    displayedReviewCount += reviewsToDisplay.length;
+    
+    // Show/hide load more button
+    if (displayedReviewCount < allReviews.length) {
+        loadMoreBtn.style.display = 'inline-flex';
     } else {
-        container.innerHTML='<p style="text-align:center;width:100%;grid-column:1/-1; color: rgba(255,255,255,0.8);">No reviews yet. Be our first reviewer!</p>';
+        loadMoreBtn.style.display = 'none';
     }
 }
+
+// Load More Reviews button click handler
+document.getElementById('loadMoreReviewsBtn').addEventListener('click', function() {
+    displayMoreReviews();
+});
 
 // Submit Review
 document.getElementById('reviewForm').addEventListener('submit', async e=>{
