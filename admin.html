@@ -400,27 +400,35 @@ async function deletePackage(id, btnEl) {
   btnEl.innerHTML = 'Deleting...';
   btnEl.disabled = true;
 
+  console.log('Attempting to delete package with id:', id, typeof id);
+
   try {
-    const { error } = await dbClient.from('tours').delete().eq('id', id);
+    const { data, error } = await dbClient.from('tours').delete().eq('id', id).select();
+    console.log('Delete response:', { data, error });
+    
     if (error) {
       console.error('Delete error:', error);
-      alert("Delete failed: " + error.message + "\n\nYou need to allow public DELETE permissions in your Supabase RLS policies for the tours table.");
+      alert("Delete failed: " + error.message + "\n\nYou need to enable DELETE permissions in Supabase RLS policies.");
+      btnEl.innerHTML = original;
+      btnEl.disabled = false;
+    } else if (data && data.length === 0) {
+      console.warn('No rows deleted - id not found or no permission');
+      alert("Package not found or you don't have permission to delete it.");
       btnEl.innerHTML = original;
       btnEl.disabled = false;
     } else {
-      // Successfully deleted - remove row with animation
+      console.log('Successfully deleted:', data);
       const tr = btnEl.closest('tr');
       tr.style.opacity = '0';
       setTimeout(() => {
         tr.remove();
-        // Reload packages list to ensure consistency
         loadAdminPackages();
         alert('Package deleted successfully!');
       }, 300);
     }
   } catch (err) {
     console.error('Exception:', err);
-    alert("An error occurred while deleting.");
+    alert("An error occurred: " + err.message);
     btnEl.innerHTML = original;
     btnEl.disabled = false;
   }
