@@ -420,6 +420,11 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
 .previous-review-card p { color: rgba(255,255,255,0.9); font-size: 0.95rem; line-height: 1.6; font-style: italic; }
 .no-reviews-message { text-align: center; color: rgba(255,255,255,0.7); grid-column: 1/-1; padding: 2rem; }
 
+/* Load More Reviews Button */
+.load-more-reviews-btn { display: block; margin: 2rem auto 0; padding: 1rem 2rem; background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 1rem; }
+.load-more-reviews-btn:hover { background: white; color: var(--primary-color); border-color: white; }
+.load-more-reviews-btn i { margin-right: 0.5rem; }
+
 /* Package highlights */
 .package-highlights { list-style: none; padding: 0; margin: 1rem 0; }
 .package-highlights li { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
@@ -589,6 +594,7 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
   .previous-reviews-title { font-size: 1.2rem; }
   .previous-reviews-grid { grid-template-columns: 1fr; gap: 1rem; }
   .previous-review-card { padding: 1.2rem; }
+  .load-more-reviews-btn { padding: 0.9rem 1.5rem; font-size: 0.95rem; }
   
   /* Contact */
   .contact-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -1302,6 +1308,10 @@ const today = new Date().toISOString().split('T')[0];
 document.getElementById('bookingDate').setAttribute('min', today);
 
 // Load reviews dynamically
+let allReviews = [];
+let displayedReviewCount = 0;
+const REVIEWS_PER_BATCH = 6;
+
 async function loadReviews() {
     const container = document.getElementById('previousReviewsContainer');
     container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-spinner ph-spin"></i> Loading reviews...</p>';
@@ -1322,27 +1332,11 @@ async function loadReviews() {
             return;
         }
         
-        container.innerHTML = '';
-        
         if (reviews && reviews.length > 0) {
-            console.log(`Loaded ${reviews.length} reviews`);
-            reviews.forEach(r => {
-                const card = document.createElement('div');
-                card.className = 'previous-review-card';
-                const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
-                const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
-                card.innerHTML = `
-                  <div class="previous-review-header">
-                    <div class="previous-review-avatar">${initial}</div>
-                    <div class="previous-review-info">
-                      <h4>${r.name || 'Guest'}</h4>
-                      <div class="previous-review-rating">${stars}</div>
-                    </div>
-                  </div>
-                  <p>"${r.review || 'No review text'}"</p>
-                `;
-                container.appendChild(card);
-            });
+            console.log(`Loaded ${reviews.length} total reviews`);
+            allReviews = reviews;
+            displayedReviewCount = 0;
+            displayReviewsBatch();
         } else {
             console.log('No reviews found in database');
             container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-info"></i> No reviews yet. Be the first to share your experience!</p>';
@@ -1353,6 +1347,53 @@ async function loadReviews() {
             <i class="ph-bold ph-warning"></i> Error loading reviews.<br>
             <small>${err.message}</small>
         </p>`;
+    }
+}
+
+function displayReviewsBatch() {
+    const container = document.getElementById('previousReviewsContainer');
+    
+    // Clear container on first batch
+    if (displayedReviewCount === 0) {
+        container.innerHTML = '';
+    }
+    
+    const nextBatch = allReviews.slice(displayedReviewCount, displayedReviewCount + REVIEWS_PER_BATCH);
+    
+    nextBatch.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'previous-review-card';
+        const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
+        const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
+        card.innerHTML = `
+          <div class="previous-review-header">
+            <div class="previous-review-avatar">${initial}</div>
+            <div class="previous-review-info">
+              <h4>${r.name || 'Guest'}</h4>
+              <div class="previous-review-rating">${stars}</div>
+            </div>
+          </div>
+          <p>"${r.review || 'No review text'}"</p>
+        `;
+        container.appendChild(card);
+    });
+    
+    displayedReviewCount += nextBatch.length;
+    
+    // Remove existing load more button if present
+    const existingBtn = document.getElementById('loadMoreReviewsBtn');
+    if (existingBtn) {
+        existingBtn.remove();
+    }
+    
+    // Add load more button if there are more reviews
+    if (displayedReviewCount < allReviews.length) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'loadMoreReviewsBtn';
+        loadMoreBtn.className = 'load-more-reviews-btn';
+        loadMoreBtn.innerHTML = `<i class="ph-bold ph-caret-down"></i> Load More Reviews (${allReviews.length - displayedReviewCount} more)`;
+        loadMoreBtn.onclick = displayReviewsBatch;
+        container.parentElement.appendChild(loadMoreBtn);
     }
 }
 
