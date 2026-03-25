@@ -1307,17 +1307,25 @@ async function loadReviews() {
     container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-spinner ph-spin"></i> Loading reviews...</p>';
     
     try {
+        console.log('Fetching reviews from Supabase...');
         const { data: reviews, error } = await dbClient.from('reviews').select('*').order('created_at', { ascending: false });
+        
+        console.log('Supabase response:', { reviews, error });
         
         if (error) {
             console.error('Error loading reviews:', error);
-            container.innerHTML = '<p class="no-reviews-message">Unable to load reviews. Please refresh the page.</p>';
+            container.innerHTML = `<p class="no-reviews-message">
+                <i class="ph-bold ph-warning"></i> Unable to load reviews.<br>
+                <small>Error: ${error.message}</small><br>
+                <small style="font-size: 0.8rem;">Check RLS policies in Supabase</small>
+            </p>`;
             return;
         }
         
         container.innerHTML = '';
         
         if (reviews && reviews.length > 0) {
+            console.log(`Loaded ${reviews.length} reviews`);
             reviews.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'previous-review-card';
@@ -1336,11 +1344,15 @@ async function loadReviews() {
                 container.appendChild(card);
             });
         } else {
-            container.innerHTML = '<p class="no-reviews-message">No reviews yet. Be the first to share your experience!</p>';
+            console.log('No reviews found in database');
+            container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-info"></i> No reviews yet. Be the first to share your experience!</p>';
         }
     } catch (err) {
         console.error('Failed to load reviews:', err);
-        container.innerHTML = '<p class="no-reviews-message">Error loading reviews. Please try again later.</p>';
+        container.innerHTML = `<p class="no-reviews-message">
+            <i class="ph-bold ph-warning"></i> Error loading reviews.<br>
+            <small>${err.message}</small>
+        </p>`;
     }
 }
 
