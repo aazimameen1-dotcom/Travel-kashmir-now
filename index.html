@@ -645,6 +645,22 @@ starIcons.forEach(star => {
 // Initialize
 loadTours();
 loadReviews();
+
+// Real-time updates for tours
+dbClient.channel('tours-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => {
+    console.log('Tours updated, refreshing...');
+    loadTours();
+  })
+  .subscribe();
+
+// Real-time updates for reviews
+dbClient.channel('reviews-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => {
+    console.log('Reviews updated, refreshing...');
+    loadReviews();
+  })
+  .subscribe();
 </script>
 
 </body>

@@ -341,17 +341,27 @@ async function deleteReview(id, btnEl) {
   btnEl.innerHTML = 'Deleting...';
   btnEl.disabled = true;
 
-  const { error } = await dbClient.from('reviews').delete().eq('id', id);
-  if (error) {
-    console.error('Delete error', error);
-    alert("Permission Denied: You need to allow public DELETE permissions in your Supabase RLS policies for the reviews table.");
+  try {
+    const { error } = await dbClient.from('reviews').delete().eq('id', id);
+    if (error) {
+      console.error('Delete error:', error);
+      alert("Delete failed: " + error.message + "\n\nYou need to allow public DELETE permissions in your Supabase RLS policies for the reviews table.");
+      btnEl.innerHTML = original;
+      btnEl.disabled = false;
+    } else {
+      const tr = btnEl.closest('tr');
+      tr.style.opacity = '0';
+      setTimeout(() => {
+        tr.remove();
+        loadAdminReviews();
+        alert('Review deleted successfully!');
+      }, 300);
+    }
+  } catch (err) {
+    console.error('Exception:', err);
+    alert("An error occurred while deleting.");
     btnEl.innerHTML = original;
     btnEl.disabled = false;
-  } else {
-    // Beautiful fade out animation
-    const tr = btnEl.closest('tr');
-    tr.style.opacity = '0';
-    setTimeout(() => tr.remove(), 300);
   }
 }
 
@@ -390,16 +400,29 @@ async function deletePackage(id, btnEl) {
   btnEl.innerHTML = 'Deleting...';
   btnEl.disabled = true;
 
-  const { error } = await dbClient.from('tours').delete().eq('id', id);
-  if (error) {
-    console.error('Delete error', error);
-    alert("Permission Denied: You need to allow public DELETE permissions in your Supabase RLS policies for the tours table.");
+  try {
+    const { error } = await dbClient.from('tours').delete().eq('id', id);
+    if (error) {
+      console.error('Delete error:', error);
+      alert("Delete failed: " + error.message + "\n\nYou need to allow public DELETE permissions in your Supabase RLS policies for the tours table.");
+      btnEl.innerHTML = original;
+      btnEl.disabled = false;
+    } else {
+      // Successfully deleted - remove row with animation
+      const tr = btnEl.closest('tr');
+      tr.style.opacity = '0';
+      setTimeout(() => {
+        tr.remove();
+        // Reload packages list to ensure consistency
+        loadAdminPackages();
+        alert('Package deleted successfully!');
+      }, 300);
+    }
+  } catch (err) {
+    console.error('Exception:', err);
+    alert("An error occurred while deleting.");
     btnEl.innerHTML = original;
     btnEl.disabled = false;
-  } else {
-    const tr = btnEl.closest('tr');
-    tr.style.opacity = '0';
-    setTimeout(() => tr.remove(), 300);
   }
 }
 
@@ -432,6 +455,21 @@ if (sessionStorage.getItem('adminLoggedIn') === 'true') {
   document.getElementById('adminSidebar').classList.remove('hidden');
   document.getElementById('adminMain').classList.remove('hidden');
 }
+
+// Real-time updates for admin panel
+dbClient.channel('admin-tours-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'tours' }, () => {
+    console.log('Tours updated, refreshing admin panel...');
+    loadAdminPackages();
+  })
+  .subscribe();
+
+dbClient.channel('admin-reviews-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => {
+    console.log('Reviews updated, refreshing admin panel...');
+    loadAdminReviews();
+  })
+  .subscribe();
 </script>
 
 </body>
