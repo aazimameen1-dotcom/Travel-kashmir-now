@@ -559,6 +559,8 @@ document.getElementById('editPackageForm').addEventListener('submit', async func
     const days = document.getElementById('editPackageDays').value;
     const duration = `${nights} Nights / ${days} Days`;
     
+    console.log('Saving package:', { id, nights, days, duration });
+    
     const updatedPackage = {
         name: document.getElementById('editPackageName').value,
         duration: duration,
@@ -567,17 +569,29 @@ document.getElementById('editPackageForm').addEventListener('submit', async func
         description: document.getElementById('editPackageDesc').value
     };
     
+    console.log('Update payload:', updatedPackage);
+    
     try {
         const { data, error } = await dbClient.from('tours').update(updatedPackage).eq('id', id).select();
         
+        console.log('Supabase response:', { data, error });
+        
         if (error) {
             console.error('Update error:', error);
-            alert("Failed to update package: " + error.message + "\n\nMake sure you have UPDATE permissions in Supabase RLS policies.");
+            alert("Failed to update package: " + error.message + "\n\nMake sure you have UPDATE permissions in Supabase RLS policies and the 'duration' column exists.");
             btn.innerHTML = originalText;
             btn.disabled = false;
             return;
         }
         
+        if (!data || data.length === 0) {
+            alert("No package was updated. Please check if the package exists.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+        
+        console.log('Successfully updated:', data);
         btn.innerHTML = '<i class="ph-bold ph-check"></i> Saved!';
         setTimeout(() => {
             closeEditModal();
