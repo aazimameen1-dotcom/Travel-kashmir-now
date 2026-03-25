@@ -1303,30 +1303,44 @@ document.getElementById('bookingDate').setAttribute('min', today);
 
 // Load reviews dynamically
 async function loadReviews() {
-    const { data: reviews, error } = await dbClient.from('reviews').select('*').order('id',{ascending:false});
     const container = document.getElementById('previousReviewsContainer');
-    container.innerHTML = '';
+    container.innerHTML = '<p class="no-reviews-message"><i class="ph-bold ph-spinner ph-spin"></i> Loading reviews...</p>';
     
-    if(!error && reviews && reviews.length > 0){
-        reviews.forEach(r => {
-            const card = document.createElement('div');
-            card.className = 'previous-review-card';
-            const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
-            const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
-            card.innerHTML = `
-              <div class="previous-review-header">
-                <div class="previous-review-avatar">${initial}</div>
-                <div class="previous-review-info">
-                  <h4>${r.name}</h4>
-                  <div class="previous-review-rating">${stars}</div>
-                </div>
-              </div>
-              <p>"${r.review}"</p>
-            `;
-            container.appendChild(card);
-        });
-    } else {
-        container.innerHTML = '<p class="no-reviews-message">Be the first to share your experience!</p>';
+    try {
+        const { data: reviews, error } = await dbClient.from('reviews').select('*').order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading reviews:', error);
+            container.innerHTML = '<p class="no-reviews-message">Unable to load reviews. Please refresh the page.</p>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        if (reviews && reviews.length > 0) {
+            reviews.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'previous-review-card';
+                const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
+                const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
+                card.innerHTML = `
+                  <div class="previous-review-header">
+                    <div class="previous-review-avatar">${initial}</div>
+                    <div class="previous-review-info">
+                      <h4>${r.name || 'Guest'}</h4>
+                      <div class="previous-review-rating">${stars}</div>
+                    </div>
+                  </div>
+                  <p>"${r.review || 'No review text'}"</p>
+                `;
+                container.appendChild(card);
+            });
+        } else {
+            container.innerHTML = '<p class="no-reviews-message">No reviews yet. Be the first to share your experience!</p>';
+        }
+    } catch (err) {
+        console.error('Failed to load reviews:', err);
+        container.innerHTML = '<p class="no-reviews-message">Error loading reviews. Please try again later.</p>';
     }
 }
 
