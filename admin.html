@@ -241,9 +241,15 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
           <label>Price (₹)</label>
           <input type="number" id="tourPrice" placeholder="15000" required>
         </div>
-        <div class="form-group">
-          <label>Duration (Days)</label>
-          <input type="text" id="tourDuration" placeholder="e.g. 3 Nights / 4 Days" required>
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Nights</label>
+            <input type="number" id="tourNights" min="0" placeholder="3" required>
+          </div>
+          <div class="form-group">
+            <label>Days</label>
+            <input type="number" id="tourDays" min="1" placeholder="4" required>
+          </div>
         </div>
         <div class="form-group full-width">
           <label>Description</label>
@@ -315,9 +321,15 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
           <label>Package Name</label>
           <input type="text" id="editPackageName" required>
         </div>
-        <div class="form-group">
-          <label>Duration (Days)</label>
-          <input type="text" id="editPackageDuration" placeholder="e.g. 3 Nights / 4 Days" required>
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Nights</label>
+            <input type="number" id="editPackageNights" min="0" placeholder="3" required>
+          </div>
+          <div class="form-group">
+            <label>Days</label>
+            <input type="number" id="editPackageDays" min="1" placeholder="4" required>
+          </div>
         </div>
         <div class="form-group">
           <label>Price (₹)</label>
@@ -502,10 +514,22 @@ async function uploadToImgBB(file) {
 function openEditModal(id, name, duration, price, rating, description) {
     document.getElementById('editPackageId').value = id;
     document.getElementById('editPackageName').value = name;
-    document.getElementById('editPackageDuration').value = duration;
     document.getElementById('editPackagePrice').value = price;
     document.getElementById('editPackageRating').value = rating;
     document.getElementById('editPackageDesc').value = description;
+    
+    // Parse duration string to extract nights and days
+    let nights = 3, days = 4;
+    if (duration) {
+        const match = duration.match(/(\d+)\s*Nights?\s*\/\s*(\d+)\s*Days?/i);
+        if (match) {
+            nights = parseInt(match[1]);
+            days = parseInt(match[2]);
+        }
+    }
+    document.getElementById('editPackageNights').value = nights;
+    document.getElementById('editPackageDays').value = days;
+    
     document.getElementById('editModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -531,9 +555,13 @@ document.getElementById('editPackageForm').addEventListener('submit', async func
     btn.disabled = true;
     
     const id = parseInt(document.getElementById('editPackageId').value);
+    const nights = document.getElementById('editPackageNights').value;
+    const days = document.getElementById('editPackageDays').value;
+    const duration = `${nights} Nights / ${days} Days`;
+    
     const updatedPackage = {
         name: document.getElementById('editPackageName').value,
-        duration: document.getElementById('editPackageDuration').value,
+        duration: duration,
         price: parseInt(document.getElementById('editPackagePrice').value),
         rating: parseInt(document.getElementById('editPackageRating').value),
         description: document.getElementById('editPackageDesc').value
@@ -584,11 +612,15 @@ document.getElementById('addTourForm').addEventListener('submit', async (e) => {
   btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Saving...';
   btn.disabled = true;
 
+  const nights = document.getElementById('tourNights').value;
+  const days = document.getElementById('tourDays').value;
+  const duration = `${nights} Nights / ${days} Days`;
+
   const newTour = {
     name: document.getElementById('tourName').value,
     image: document.getElementById('tourImage').value,
     price: parseInt(document.getElementById('tourPrice').value),
-    duration: document.getElementById('tourDuration').value,
+    duration: duration,
     description: document.getElementById('tourDesc').value,
     rating: 5
   };
