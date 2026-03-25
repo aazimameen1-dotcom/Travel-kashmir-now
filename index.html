@@ -697,6 +697,7 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
         <div>
           <h3>Srinagar City Tour Cab</h3>
           <p>Reliable and comfortable taxi services for city tours, airport pickups, and local sightseeing around Srinagar.</p>
+          <p style="color:var(--secondary-color); font-weight:600; margin-top:0.5rem;">Starting from ₹2,500/day</p>
         </div>
       </div>
       
@@ -705,10 +706,20 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
         <div>
           <h3>Long-Distance Travel Cab</h3>
           <p>Spacious SUVs and sedans for comprehensive full-day and multi-day packages across all major destinations.</p>
+          <p style="color:var(--secondary-color); font-weight:600; margin-top:0.5rem;">Starting from ₹3,500/day</p>
         </div>
       </div>
       
-      <a href="tel:+918899434467" class="cta-primary btn-text" style="margin-top: 1rem;"><i class="ph-bold ph-phone"></i> Book a Ride</a>
+      <div class="cab-item">
+        <div class="cab-item-icon"><i class="ph-fill ph-airplane"></i></div>
+        <div>
+          <h3>Airport Transfers</h3>
+          <p>24/7 airport pickup and drop-off service from Srinagar International Airport to any destination in Kashmir.</p>
+          <p style="color:var(--secondary-color); font-weight:600; margin-top:0.5rem;">Starting from ₹1,500</p>
+        </div>
+      </div>
+      
+      <button onclick="openBookingModal('Cab Service')" class="cta-primary btn-text" style="margin-top: 1rem;"><i class="ph-bold ph-calendar-plus"></i> Book a Ride</button>
     </div>
   </div>
 </section>
@@ -779,6 +790,31 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
       <a href="mailto:travelkashmir11@gmail.com">travelkashmir11@gmail.com</a><br>
       <p style="margin-top:0.5rem; font-size:1rem;">Fast Replies</p>
     </div>
+  </div>
+  
+  <div class="contact-form-section">
+    <h3 style="text-align:center; color:var(--primary-color); margin-bottom:1.5rem; font-size:1.5rem;"><i class="ph-bold ph-paper-plane-right"></i> Send Us a Message</h3>
+    <form id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" name="name" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+          <input type="email" name="email" placeholder="Your Email" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <input type="text" name="subject" placeholder="Subject">
+      </div>
+      <div class="form-group">
+        <textarea name="message" rows="5" placeholder="Your message..." required></textarea>
+      </div>
+      <button type="submit" class="booking-btn"><i class="ph-bold ph-send"></i> Send Message</button>
+    </form>
+  </div>
+  
+  <div class="map-container">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d211697.22461973884!2d74.61668155!3d34.08367005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e18ef0f1ff9d05%3A0xdd976d377a3f72f7!2sSrinagar!5e0!3m2!1sen!2sin!4v1706697600000!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
 </section>
 
@@ -1151,6 +1187,50 @@ starIcons.forEach(star => {
       else s.classList.remove('active');
     });
   });
+});
+
+// Handle contact form submission
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('.booking-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Sending...';
+    btn.disabled = true;
+    
+    try {
+        const formData = new FormData(this);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+            btn.innerHTML = '<i class="ph-bold ph-check"></i> Message Sent!';
+            this.reset();
+            alert('Thank you for your message! We will get back to you soon.');
+        } else {
+            throw new Error('Form submission failed');
+        }
+    } catch (err) {
+        // Fallback: Send via mailto
+        const name = this.querySelector('input[name="name"]').value;
+        const email = this.querySelector('input[name="email"]').value;
+        const subject = this.querySelector('input[name="subject"]').value;
+        const message = this.querySelector('textarea[name="message"]').value;
+        
+        const mailtoSubject = encodeURIComponent(subject || 'Contact Form Submission');
+        const mailtoBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+        
+        window.open(`mailto:travelkashmir11@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`);
+        btn.innerHTML = '<i class="ph-bold ph-check"></i> Email Opened!';
+        this.reset();
+    } finally {
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 2000);
+    }
 });
 
 // Initialize
