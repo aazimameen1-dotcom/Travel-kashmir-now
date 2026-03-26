@@ -828,6 +828,8 @@ document.getElementById('editVehicleForm').addEventListener('submit', async func
     
     const id = parseInt(document.getElementById('editVehicleId').value);
     
+    console.log('Editing vehicle with ID:', id, typeof id);
+    
     const updatedVehicle = {
         name: document.getElementById('editVehicleName').value,
         capacity: document.getElementById('editVehicleCapacity').value,
@@ -836,8 +838,12 @@ document.getElementById('editVehicleForm').addEventListener('submit', async func
         featured: document.getElementById('editVehicleFeatured').checked
     };
     
+    console.log('Update payload:', updatedVehicle);
+    
     try {
         const { data, error } = await dbClient.from('vehicles').update(updatedVehicle).eq('id', id).select();
+        
+        console.log('Supabase response:', { data, error });
         
         if (error) {
             console.error('Update error:', error);
@@ -848,12 +854,14 @@ document.getElementById('editVehicleForm').addEventListener('submit', async func
         }
         
         if (!data || data.length === 0) {
-            alert("No vehicle was updated. Please check if the vehicle exists.");
+            console.warn('No data returned from update. ID may not exist or RLS blocking.');
+            alert("No vehicle was updated. Please check if the vehicle exists and RLS policies allow updates.");
             btn.innerHTML = originalText;
             btn.disabled = false;
             return;
         }
         
+        console.log('Successfully updated:', data);
         btn.innerHTML = '<i class="ph-bold ph-check"></i> Saved!';
         setTimeout(() => {
             closeEditVehicleModal();
