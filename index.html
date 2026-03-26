@@ -1261,12 +1261,45 @@ document.getElementById('loadMoreReviewsBtn').addEventListener('click', function
     displayMoreReviews();
 });
 
+// Image compression function for mobile compatibility
+function compressImage(dataUrl, maxWidth = 1200, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = function() {
+            let width = img.width;
+            let height = img.height;
+            
+            // Calculate new dimensions
+            if (width > maxWidth) {
+                height = Math.round(height * (maxWidth / width));
+                width = maxWidth;
+            }
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to compressed JPEG
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedDataUrl);
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+}
+
 // Review Image Upload Handler - Multiple images
 let reviewImages = [];
 
-document.getElementById('reviewImage').addEventListener('change', function(e) {
+document.getElementById('reviewImage').addEventListener('change', async function(e) {
+    console.log('File input changed, files:', e.target.files);
     const files = Array.from(e.target.files);
-    if (!files.length) return;
+    if (!files.length) {
+        console.log('No files selected');
+        return;
+    }
     
     // Check total count (max 5)
     if (reviewImages.length + files.length > 5) {
@@ -1275,36 +1308,49 @@ document.getElementById('reviewImage').addEventListener('change', function(e) {
     }
     
     const container = document.getElementById('imagePreviewContainer');
+    console.log('Processing', files.length, 'files');
     
-    files.forEach(file => {
+    for (const file of files) {
         // Check file size (max 20MB)
         if (file.size > 20 * 1024 * 1024) {
             alert(`Skipping ${file.name}: Image size must be less than 20MB`);
-            return;
+            continue;
         }
         
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const imageData = event.target.result;
-            const imageId = Date.now() + Math.random();
+        try {
+            const reader = new FileReader();
+            const imageData = await new Promise((resolve, reject) => {
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
             
-            reviewImages.push({ id: imageId, data: imageData });
+            // Compress image for mobile compatibility
+            console.log('Compressing image...');
+            const compressedData = await compressImage(imageData, 1200, 0.7);
+            console.log('Original size:', Math.round(imageData.length / 1024), 'KB, Compressed:', Math.round(compressedData.length / 1024), 'KB');
+            
+            const imageId = 'img_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+            reviewImages.push({ id: imageId, data: compressedData });
+            console.log('Image loaded and compressed, total images:', reviewImages.length);
             
             // Create preview
             const previewDiv = document.createElement('div');
             previewDiv.className = 'image-preview';
             previewDiv.id = `preview-${imageId}`;
             previewDiv.innerHTML = `
-                <img src="${imageData}" alt="Preview">
-                <button type="button" class="remove-image-btn" onclick="removeReviewImage(${imageId})"><i class="ph-bold ph-x"></i></button>
+                <img src="${compressedData}" alt="Preview">
+                <button type="button" class="remove-image-btn" onclick="removeReviewImage('${imageId}')"><i class="ph-bold ph-x"></i></button>
             `;
             container.appendChild(previewDiv);
             container.style.display = 'flex';
             
             updateImageLabel();
-        };
-        reader.readAsDataURL(file);
-    });
+        } catch (err) {
+            console.error('Error processing image:', err);
+            alert(`Failed to process ${file.name}`);
+        }
+    }
 });
 
 function removeReviewImage(imageId) {
@@ -1337,6 +1383,7 @@ function clearReviewImages() {
 
 // Submit Review
 document.getElementById('reviewForm').addEventListener('submit', async e=>{
+    console.log('Review form submitted');
     e.preventDefault();
     const btn = e.target.querySelector('button');
     const originalText = btn.innerHTML;
@@ -1347,21 +1394,29 @@ document.getElementById('reviewForm').addEventListener('submit', async e=>{
         const name=document.getElementById('reviewerName').value;
         const review=document.getElementById('reviewText').value;
         const rating=parseInt(document.getElementById('reviewRating').value) || 5;
-        const image = document.getElementById('reviewImageData').value || null;
+        
+        console.log('Review data:', { name, review, rating, imageCount: reviewImages.length });
         
         const reviewData = {name, review, rating};
-        if (image) reviewData.image = image;
+        
+        // Add images if any
+        if (reviewImages.length > 0) {
+            reviewData.images = reviewImages.map(img => img.data);
+            console.log('Adding', reviewImages.length, 'images to review');
+        }
+        
+        console.log('Sending to Supabase:', reviewData);
         
         const { error } = await dbClient.from('reviews').insert([reviewData]);
         
         if (error) {
             console.error('Supabase Error:', error);
-            alert("Failed to publish review. Please try again.");
+            alert("Failed to publish review: " + error.message + "\n\nDetails: " + JSON.stringify(error));
             throw error;
         }
         
         document.getElementById('reviewForm').reset();
-        clearReviewImage();
+        clearReviewImages();
         // Reset stars
         document.getElementById('reviewRating').value = 5;
         document.querySelectorAll('#starSelector i').forEach(s => s.classList.add('active'));
