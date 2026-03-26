@@ -188,6 +188,7 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
 <aside id="adminSidebar" class="hidden">
   <div class="brand"><i class="ph-fill ph-paper-plane-tilt"></i> Admin Panel</div>
   <button class="nav-btn active" onclick="switchTab('packagesTab', event)"><i class="ph-bold ph-suitcase"></i> Manage Packages</button>
+  <button class="nav-btn" onclick="switchTab('vehiclesTab', event)"><i class="ph-bold ph-car"></i> Manage Vehicles</button>
   <button class="nav-btn" onclick="switchTab('reviewsTab', event)"><i class="ph-bold ph-star"></i> Manage Reviews</button>
   <a href="index.html" class="nav-btn" style="text-decoration:none; margin-top:auto;"><i class="ph-bold ph-arrow-left"></i> View Live Site</a>
 </aside>
@@ -282,6 +283,60 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
     </div>
   </div>
 
+  <!-- Manage Vehicles Section -->
+  <div id="vehiclesTab" class="section">
+    <div class="card">
+      <h2><i class="ph-bold ph-plus-circle"></i> Add New Vehicle</h2>
+      <form id="addVehicleForm">
+        <div class="form-group">
+          <label>Vehicle Name</label>
+          <input type="text" id="vehicleName" placeholder="e.g. Sedan, Innova Crysta" required>
+        </div>
+        <div class="form-group">
+          <label>Seating Capacity</label>
+          <input type="text" id="vehicleCapacity" placeholder="e.g. 4 Seater, 7 Seater" required>
+        </div>
+        <div class="form-group">
+          <label>Price Per Day (₹)</label>
+          <input type="number" id="vehiclePrice" placeholder="2500" required>
+        </div>
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea id="vehicleDesc" placeholder="Enter vehicle description..." rows="2" required></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>
+            <input type="checkbox" id="vehicleFeatured" style="width: auto; margin-right: 0.5rem;">
+            Featured Vehicle (Premium)
+          </label>
+        </div>
+        <button type="submit" class="submit-btn"><i class="ph-bold ph-floppy-disk"></i> Save Vehicle to Database</button>
+      </form>
+    </div>
+    
+    <!-- Existing Vehicles List -->
+    <div class="card">
+      <h2 style="display:flex; justify-content:space-between; align-items:center;">
+        <span><i class="ph-bold ph-list-dashes"></i> Existing Vehicles</span>
+        <button onclick="loadAdminVehicles()" style="padding:0.5rem; border-radius:8px; border:none; background:#e2e8f0; cursor:pointer;" title="Refresh"><i class="ph-bold ph-arrows-clockwise"></i></button>
+      </h2>
+      <table id="vehiclesTable">
+        <thead>
+          <tr>
+            <th>Vehicle Name</th>
+            <th>Capacity</th>
+            <th>Price/Day (₹)</th>
+            <th>Type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="vehiclesTbody">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Manage Reviews Section -->
   <div id="reviewsTab" class="section">
     <div class="card">
@@ -342,6 +397,44 @@ th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font
         <div class="form-group">
           <label>Description</label>
           <textarea id="editPackageDesc" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="save-btn"><i class="ph-bold ph-floppy-disk"></i> Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Vehicle Modal -->
+<div class="edit-modal-overlay" id="editVehicleModal">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h3><i class="ph-bold ph-pencil"></i> Edit Vehicle</h3>
+      <button class="modal-close" onclick="closeEditVehicleModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="edit-modal-body">
+      <form class="edit-form" id="editVehicleForm">
+        <input type="hidden" id="editVehicleId">
+        <div class="form-group">
+          <label>Vehicle Name</label>
+          <input type="text" id="editVehicleName" required>
+        </div>
+        <div class="form-group">
+          <label>Seating Capacity</label>
+          <input type="text" id="editVehicleCapacity" placeholder="e.g. 4 Seater" required>
+        </div>
+        <div class="form-group">
+          <label>Price Per Day (₹)</label>
+          <input type="number" id="editVehiclePrice" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="editVehicleDesc" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="editVehicleFeatured" style="width: auto; margin-right: 0.5rem;">
+            Featured Vehicle (Premium)
+          </label>
         </div>
         <button type="submit" class="save-btn"><i class="ph-bold ph-floppy-disk"></i> Save Changes</button>
       </form>
@@ -613,9 +706,203 @@ function switchTab(tabId, event) {
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
   if(event) event.currentTarget.classList.add('active');
-  document.getElementById('pageTitle').innerText = tabId === 'packagesTab' ? 'Manage Packages' : 'Manage Reviews';
-  if(tabId === 'reviewsTab') loadAdminReviews();
-  if(tabId === 'packagesTab') loadAdminPackages();
+  if(tabId === 'packagesTab') {
+    document.getElementById('pageTitle').innerText = 'Manage Packages';
+    loadAdminPackages();
+  } else if(tabId === 'vehiclesTab') {
+    document.getElementById('pageTitle').innerText = 'Manage Vehicles';
+    loadAdminVehicles();
+  } else if(tabId === 'reviewsTab') {
+    document.getElementById('pageTitle').innerText = 'Manage Reviews';
+    loadAdminReviews();
+  }
+}
+
+// Vehicle Management Functions
+// Add Vehicle Form Submit
+document.getElementById('addVehicleForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  const original = btn.innerHTML;
+  btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Saving...';
+  btn.disabled = true;
+
+  const newVehicle = {
+    name: document.getElementById('vehicleName').value,
+    capacity: document.getElementById('vehicleCapacity').value,
+    price: parseInt(document.getElementById('vehiclePrice').value),
+    description: document.getElementById('vehicleDesc').value,
+    featured: document.getElementById('vehicleFeatured').checked,
+    active: true
+  };
+
+  try {
+    const { error } = await dbClient.from('vehicles').insert([newVehicle]);
+    if (error) {
+      console.error(error);
+      alert('Failed to save vehicle. You need to allow INSERT permissions in your Supabase RLS policies for the "vehicles" table!\n\nError: ' + error.message);
+      throw error;
+    }
+    e.target.reset();
+    btn.innerHTML = '<i class="ph-bold ph-check-circle"></i> Success! Vehicle added.';
+    loadAdminVehicles();
+  } catch(err) {
+    btn.innerHTML = '<i class="ph-bold ph-warning"></i> Error Saving';
+    console.error(err);
+  } finally {
+    setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 3000);
+  }
+});
+
+// Load Vehicles
+async function loadAdminVehicles() {
+  const tbody = document.getElementById('vehiclesTbody');
+  tbody.innerHTML = '<tr><td colspan="5"><i class="ph-bold ph-spinner ph-spin"></i> Loading vehicles...</td></tr>';
+  const { data: vehicles, error } = await dbClient.from('vehicles').select('*').order('id', {ascending: false});
+  
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:red;">Error loading vehicles: ${error.message}</td></tr>`;
+    return;
+  }
+  
+  if (!vehicles || vehicles.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">No vehicles found in the database.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  vehicles.forEach(v => {
+    const tr = document.createElement('tr');
+    const typeBadge = v.featured 
+      ? '<span style="background: rgba(245, 158, 11, 0.1); color: #d97706; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;"><i class="ph-bold ph-crown"></i> Premium</span>'
+      : '<span style="background: rgba(15, 118, 110, 0.1); color: #0f766e; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Standard</span>';
+    tr.innerHTML = `
+      <td><strong>${v.name}</strong></td>
+      <td>${v.capacity || 'N/A'}</td>
+      <td>₹${v.price?.toLocaleString() || 'N/A'}</td>
+      <td>${typeBadge}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="edit-btn" onclick="openEditVehicleModal(${v.id}, '${v.name.replace(/'/g, "\\'")}', '${(v.capacity || '').replace(/'/g, "\\'")}', ${v.price}, '${(v.description || '').replace(/'/g, "\\'")}', ${v.featured || false})"><i class="ph-bold ph-pencil"></i> Edit</button>
+          <button class="delete-btn" onclick="deleteVehicle(${v.id}, this)"><i class="ph-bold ph-trash"></i> Delete</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Open Edit Vehicle Modal
+function openEditVehicleModal(id, name, capacity, price, description, featured) {
+    document.getElementById('editVehicleId').value = id;
+    document.getElementById('editVehicleName').value = name;
+    document.getElementById('editVehicleCapacity').value = capacity;
+    document.getElementById('editVehiclePrice').value = price;
+    document.getElementById('editVehicleDesc').value = description;
+    document.getElementById('editVehicleFeatured').checked = featured;
+    
+    document.getElementById('editVehicleModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Close Edit Vehicle Modal
+function closeEditVehicleModal() {
+    document.getElementById('editVehicleModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close vehicle modal when clicking outside
+document.getElementById('editVehicleModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditVehicleModal();
+    }
+});
+
+// Handle Edit Vehicle Form Submit
+document.getElementById('editVehicleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('.save-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Saving...';
+    btn.disabled = true;
+    
+    const id = parseInt(document.getElementById('editVehicleId').value);
+    
+    const updatedVehicle = {
+        name: document.getElementById('editVehicleName').value,
+        capacity: document.getElementById('editVehicleCapacity').value,
+        price: parseInt(document.getElementById('editVehiclePrice').value),
+        description: document.getElementById('editVehicleDesc').value,
+        featured: document.getElementById('editVehicleFeatured').checked
+    };
+    
+    try {
+        const { data, error } = await dbClient.from('vehicles').update(updatedVehicle).eq('id', id).select();
+        
+        if (error) {
+            console.error('Update error:', error);
+            alert("Failed to update vehicle: " + error.message + "\n\nMake sure you have UPDATE permissions in Supabase RLS policies.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            alert("No vehicle was updated. Please check if the vehicle exists.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+        
+        btn.innerHTML = '<i class="ph-bold ph-check"></i> Saved!';
+        setTimeout(() => {
+            closeEditVehicleModal();
+            loadAdminVehicles();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 1000);
+    } catch (err) {
+        console.error('Exception:', err);
+        alert("An error occurred while saving: " + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+// Delete Vehicle
+async function deleteVehicle(id, btnEl) {
+  if(!confirm("Are you sure you want to permanently delete this vehicle? This cannot be undone.")) return;
+  const original = btnEl.innerHTML;
+  btnEl.innerHTML = 'Deleting...';
+  btnEl.disabled = true;
+
+  try {
+    const { data, error } = await dbClient.from('vehicles').delete().eq('id', id).select();
+    
+    if (error) {
+      console.error('Delete error:', error);
+      alert("Delete failed: " + error.message + "\n\nYou need to enable DELETE permissions in Supabase RLS policies.");
+      btnEl.innerHTML = original;
+      btnEl.disabled = false;
+    } else if (data && data.length === 0) {
+      alert("Vehicle not found or you don't have permission to delete it.");
+      btnEl.innerHTML = original;
+      btnEl.disabled = false;
+    } else {
+      const tr = btnEl.closest('tr');
+      tr.style.opacity = '0';
+      setTimeout(() => {
+        tr.remove();
+        loadAdminVehicles();
+        alert('Vehicle deleted successfully!');
+      }, 300);
+    }
+  } catch (err) {
+    console.error('Exception:', err);
+    alert("An error occurred: " + err.message);
+    btnEl.innerHTML = original;
+    btnEl.disabled = false;
+  }
 }
 
 // Add Tour logic
@@ -832,6 +1119,13 @@ dbClient.channel('admin-reviews-changes')
   .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => {
     console.log('Reviews updated, refreshing admin panel...');
     loadAdminReviews();
+  })
+  .subscribe();
+
+dbClient.channel('admin-vehicles-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+    console.log('Vehicles updated, refreshing admin panel...');
+    loadAdminVehicles();
   })
   .subscribe();
 </script>
