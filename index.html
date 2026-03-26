@@ -324,6 +324,35 @@ form textarea { min-height: 150px; resize: vertical;}
   font-size: 0.9rem; transition: background 0.3s;
 }
 .remove-image-btn:hover { background: rgba(220, 38, 38, 0.8); }
+.image-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.image-preview-container .image-preview {
+  display: block !important;
+  width: 100px;
+  height: 100px;
+  margin: 0;
+}
+.image-preview-container .image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-preview-container .image-preview .remove-image-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
+}
+.review-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
 .review-card-image {
   width: 100%; height: 180px; object-fit: cover;
   border-radius: 12px; margin: 1rem 0;
@@ -786,16 +815,13 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
       
       <!-- Image Upload -->
       <div class="review-image-upload">
-        <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">Add a photo (optional):</p>
+        <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">Add photos (optional, max 5):</p>
         <div class="image-upload-wrapper">
-          <input type="file" id="reviewImage" accept="image/*" hidden>
+          <input type="file" id="reviewImage" accept="image/*" multiple hidden>
           <label for="reviewImage" class="image-upload-label">
-            <i class="ph-bold ph-camera"></i> <span id="imageLabel">Choose Photo</span>
+            <i class="ph-bold ph-camera"></i> <span id="imageLabel">Choose Photos</span>
           </label>
-          <div id="imagePreview" class="image-preview" style="display: none;">
-            <img src="" alt="Preview">
-            <button type="button" class="remove-image-btn" onclick="clearReviewImage()"><i class="ph-bold ph-x"></i></button>
-          </div>
+          <div id="imagePreviewContainer" class="image-preview-container" style="display: none;"></div>
         </div>
       </div>
       
@@ -808,7 +834,6 @@ footer { text-align: center; padding: 4rem 2rem 2rem; background: var(--bg-color
         <i class="ph-fill ph-star active" data-val="5"></i>
       </div>
       <input type="hidden" id="reviewRating" value="5">
-      <input type="hidden" id="reviewImageData" value="">
 
       <button type="submit"><i class="ph-bold ph-paper-plane-right"></i> Publish Review</button>
     </form>
@@ -1202,7 +1227,10 @@ function displayMoreReviews() {
         card.className = 'review-card';
         const stars = r.rating ? '★'.repeat(r.rating) : '★★★★★';
         const initial = r.name ? r.name.charAt(0).toUpperCase() : 'G';
-        const imageHtml = r.image ? `<img src="${r.image}" alt="Review photo" class="review-card-image" onerror="this.style.display='none'">` : '';
+        const images = r.images || (r.image ? [r.image] : []);
+        const imagesHtml = images.length > 0 
+            ? `<div class="review-images-grid">${images.map((img, idx) => `<img src="${img}" alt="Review photo ${idx+1}" class="review-card-image" onerror="this.style.display='none'">`).join('')}</div>`
+            : '';
         card.innerHTML = `
           <div class="review-header">
             <div class="avatar">${initial}</div>
@@ -1212,7 +1240,7 @@ function displayMoreReviews() {
             </div>
           </div>
           <p>"${r.review}"</p>
-          ${imageHtml}
+          ${imagesHtml}
         `;
         container.appendChild(card);
     });
@@ -1233,34 +1261,78 @@ document.getElementById('loadMoreReviewsBtn').addEventListener('click', function
     displayMoreReviews();
 });
 
-// Review Image Upload Handler
+// Review Image Upload Handler - Multiple images
+let reviewImages = [];
+
 document.getElementById('reviewImage').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
     
-    // Check file size (max 20MB)
-    if (file.size > 20 * 1024 * 1024) {
-        alert('Image size must be less than 20MB');
+    // Check total count (max 5)
+    if (reviewImages.length + files.length > 5) {
+        alert('Maximum 5 photos allowed');
         return;
     }
     
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const imageData = event.target.result;
-        document.getElementById('reviewImageData').value = imageData;
-        document.getElementById('imagePreview').style.display = 'inline-block';
-        document.getElementById('imagePreview').querySelector('img').src = imageData;
-        document.getElementById('imageLabel').textContent = 'Change Photo';
-    };
-    reader.readAsDataURL(file);
+    const container = document.getElementById('imagePreviewContainer');
+    
+    files.forEach(file => {
+        // Check file size (max 20MB)
+        if (file.size > 20 * 1024 * 1024) {
+            alert(`Skipping ${file.name}: Image size must be less than 20MB`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const imageData = event.target.result;
+            const imageId = Date.now() + Math.random();
+            
+            reviewImages.push({ id: imageId, data: imageData });
+            
+            // Create preview
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'image-preview';
+            previewDiv.id = `preview-${imageId}`;
+            previewDiv.innerHTML = `
+                <img src="${imageData}" alt="Preview">
+                <button type="button" class="remove-image-btn" onclick="removeReviewImage(${imageId})"><i class="ph-bold ph-x"></i></button>
+            `;
+            container.appendChild(previewDiv);
+            container.style.display = 'flex';
+            
+            updateImageLabel();
+        };
+        reader.readAsDataURL(file);
+    });
 });
 
-function clearReviewImage() {
+function removeReviewImage(imageId) {
+    reviewImages = reviewImages.filter(img => img.id !== imageId);
+    const preview = document.getElementById(`preview-${imageId}`);
+    if (preview) preview.remove();
+    
+    if (reviewImages.length === 0) {
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+    updateImageLabel();
+}
+
+function updateImageLabel() {
+    const label = document.getElementById('imageLabel');
+    if (reviewImages.length === 0) {
+        label.textContent = 'Choose Photos';
+    } else {
+        label.textContent = `${reviewImages.length} photo${reviewImages.length > 1 ? 's' : ''} selected`;
+    }
+}
+
+function clearReviewImages() {
+    reviewImages = [];
     document.getElementById('reviewImage').value = '';
-    document.getElementById('reviewImageData').value = '';
-    document.getElementById('imagePreview').style.display = 'none';
-    document.getElementById('imagePreview').querySelector('img').src = '';
-    document.getElementById('imageLabel').textContent = 'Choose Photo';
+    document.getElementById('imagePreviewContainer').innerHTML = '';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('imageLabel').textContent = 'Choose Photos';
 }
 
 // Submit Review
